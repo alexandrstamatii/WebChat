@@ -25,8 +25,8 @@ public class User {
     @ManyToOne
     private City city;
 
-    @Column(length = 5)
-    private String language;
+    @ManyToOne
+    private Language language;
 
     @NotNull
     @UniqueElements(message = "This username already exists")
@@ -43,7 +43,7 @@ public class User {
     @NotNull
     private String password;
 
-    @DateTimeFormat(pattern = "dd.MM.yyyy") //throws DateTimeParseException ("Date format should be dd.MM.yyyy")
+    //@DateTimeFormat(pattern = "dd.MM.yyyy") //throws DateTimeParseException ("Date format should be dd.MM.yyyy")
     private LocalDate dob;
 
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Hex value must be in the format #RRGGBB")
@@ -81,6 +81,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PrivateMessage> privateMessages;
+
+    @PrePersist
+    public void setDefaultOnPersist(){
+        if (this.language == null) {
+            this.language = new Language();
+            this.language.setId(1L);
+        }
+    }
 
     @PreUpdate
     public void setDefaultOnUpdate() {

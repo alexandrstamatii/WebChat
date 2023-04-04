@@ -1,5 +1,7 @@
 package com.astamatii.endava.webchat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +37,12 @@ public class WebChatApplication implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(localeChangeInterceptor());
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		JavaTimeModule module = new JavaTimeModule();
+		return new ObjectMapper().registerModule(module);
 	}
 }
 

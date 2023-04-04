@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class RoomUserDto {
+    private Long id;
     private boolean muted;
 }

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <style>
+    .box {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      padding: 10px;
+    }
+    .label {
+      flex: 1;
+      text-align: right;
+      margin-right: 10px;
+    }
+    .input {
+      flex: 2;
+    }
+
+    </style>
+</head>
+<body>
+<h1 style="text-align: center;">Sign Up</h1>
+<div class="box">
+    <label class="label">Username:</label>
+    <div class="input">
+        <input type="text" name="username"/>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Email:</label>
+    <div class="input">
+        <input type="text" name="email"/>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Password:</label>
+    <div class="input">
+        <input type="password" name="password"/>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Verify Password:</label>
+    <div class="input">
+        <input type="password" name="verifyPassword"/>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Select Country:</label>
+    <div class="input">
+        <select name="country" th:field="*{country}">
+            <option th:each="c : ${countries}" th:value="${c.id}" th:text="${c.name}">Country</option>
+        </select>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Select City:</label>
+    <div class="input">
+        <select name="city" th:field="*{city}">
+            <option th:each="c : ${cities}" th:value="${c.id}" th:text="${c.name}">City</option>
+        </select>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Select Language:</label>
+    <div class="input">
+        <select name="language" th:field="*{language}">
+            <option th:each="l : ${languages}" th:value="${l.id}" th:text="${l.name}">Language</option>
+        </select>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Date of Birth:</label>
+    <div class="input">
+        <input type="date" name="dateOfBirth"/>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Text Color:</label>
+    <div class="input">
+        <input type="color" name="textColor"/>
+    </div>
+</div>
+<div class="box">
+    <label class="label">Theme:</label>
+    <div class="input">
+        <select name="theme" th:field="*{theme}">
+            <option th:each="t : ${themes}" th:value="${t.id}" th:text="${t.name}">Theme</option>
+        </select>
+    </div>
+</div>
+<button type="button" onclick="registerUser()">Register</button>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function registerUser() {
+  var user = {
+    username: $('input[name="username"]').val(),
+    email: $('input[name="email"]').val(),
+    password: $('input[name="password"]').val(),
+    verifyPassword: $('input[name="verifyPassword"]').val(),
+    country: $('select[name="country"]').val(),
+    city: $('select[name="city"]').val(),
+    language: $('select[name="language"]').val(),
+    dob: $('input[name="dateOfBirth"]').val(),
+    textColor: $('input[name="textColor"]').val(),
+    theme: $('select[name="theme"]').val()
+  };
+
+  $.ajax({
+    type: 'POST',
+    url: '/register',
+    contentType: 'application/json',
+    data: JSON.stringify(user),
+    success: function(response) {
+      console.log('User registered:', response);
+      // здесь можно выполнить какие-то действия после успешной регистрации
+    },
+    error: function(xhr, status, error) {
+      console.error('Registration failed:', error);
+      // здесь можно обработать ошибку регистрации
+    }
+  });
+}
+
+</script>
+<!--<script>-->
+<!--    function registerUser() {-->
+<!--      var user = {-->
+<!--        username: document.getElementsByName("username")[0].value,-->
+<!--        email: document.getElementsByName("email")[0].value,-->
+<!--        password: document.getElementsByName("password")[0].value,-->
+<!--        verifyPassword: document.getElementsByName("verifyPassword")[0].value,-->
+<!--        country: document.getElementsByName("country")[0].value,-->
+<!--        city: document.getElementsByName("city")[0].value,-->
+<!--        language: document.getElementsByName("language")[0].value,-->
+<!--        dateOfBirth: document.getElementsByName("dateOfBirth")[0].value,-->
+<!--        textColor: document.getElementsByName("textColor")[0].value,-->
+<!--        theme: document.getElementsByName("theme")[0].value-->
+<!--      };-->
+<!--      console.log(user);-->
+<!--      // здесь отправляем объект Dto UserDto на сервер-->
+<!--    }-->
+<!--  </script>-->
+</body>
+</html>

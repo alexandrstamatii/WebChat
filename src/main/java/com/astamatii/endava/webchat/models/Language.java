@@ -1,26 +1,26 @@
 package com.astamatii.endava.webchat.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
 @NoArgsConstructor
 @Setter
 @Getter
-public class Country {
+public class Language {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
-    private Icon icon;
-    private String countryName;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
-    private Set<City> cities = new HashSet<>();
+    @NotNull
+    @Column(unique = true)
+    private String languageName;
 
+    @NotNull
+    @Column(unique = true)
+    private String languageInitials;
 }

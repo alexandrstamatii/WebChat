@@ -21,7 +21,7 @@ public class IgnoredUser {
     @ManyToOne(fetch = FetchType.LAZY)
     private RoomUser roomUser;
 
-    @OneToMany(mappedBy = "ignoredUser", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<RoomUser> ignoredRoomUsers = new HashSet<>();
 
     // getters and setters
