@@ -22,8 +22,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne
-    @JoinColumn(name = "created_by_user_id")
-    private User user;
+    private Person person;
 
     @NotNull
     @UniqueElements(message = "This room name is already taken")
@@ -48,16 +47,16 @@ public class Room {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "banned_users",
+            name = "banned_people",
             joinColumns = @JoinColumn(name = "room_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> bannedUsers;
+            inverseJoinColumns = @JoinColumn(name = "person_id"))
+    private List<Person> bannedPeople;
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "allowed_users",
+            name = "allowed_people",
             joinColumns = @JoinColumn(name = "room_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> allowedUsers;
+            inverseJoinColumns = @JoinColumn(name = "person_id"))
+    private List<Person> allowedPeople;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<RoomUser> roomUser;

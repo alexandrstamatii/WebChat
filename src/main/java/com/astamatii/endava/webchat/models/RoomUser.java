@@ -21,7 +21,7 @@ public class RoomUser {
     @ManyToOne
     private Room room;
     @ManyToOne
-    private User user;
+    private Person person;
 
     @ColumnDefault("false")
     private boolean muted;
@@ -32,6 +32,7 @@ public class RoomUser {
     @ColumnDefault("now()")
     private ZonedDateTime joinedAt;
 
-    @OneToMany(mappedBy = "roomUser", cascade = CascadeType.ALL)
-    private Set<IgnoredUser> ignoredUsers = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "ignored_users")
+    private Set<RoomUser> ignoredRoomUsers = new HashSet<>();
 }

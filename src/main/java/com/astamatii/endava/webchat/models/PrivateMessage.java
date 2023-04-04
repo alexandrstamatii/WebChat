@@ -19,12 +19,12 @@ public class PrivateMessage {
     @ManyToOne
     private Room room;
     @ManyToOne
-    @JoinColumn(name = "sender_user_id")
-    private User user;
+    @JoinColumn(name = "sender_person_id")
+    private Person person;
 
     @ManyToOne
-    @JoinColumn(name = "recipient_user_id")
-    private User recipient;
+    @JoinColumn(name = "recipient_person_id")
+    private Person recipient;
 
     private String messageText;
 

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.validator.constraints.UniqueElements;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -17,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @Getter
-public class User {
+public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,12 +46,10 @@ public class User {
     private LocalDate dob;
 
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Hex value must be in the format #RRGGBB")
-    @ColumnDefault("#000000")
-    @Column(length = 7)
+    @Column(columnDefinition = "varchar(7) default '#000000'")
     private String textColor;
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("COLORED")
-    @Column(length = 10)
+    @Column(columnDefinition = "varchar(10) default 'COLORED'")
     private Theme theme;
 
     @Min(0)
@@ -65,21 +62,21 @@ public class User {
     @ColumnDefault("now()")
     private ZonedDateTime updatedAt;
 
-    @ManyToMany(mappedBy = "bannedUsers", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "bannedPeople", cascade = CascadeType.ALL)
     private List<Room> bannedRooms;
-    @ManyToMany(mappedBy = "allowedUsers", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "allowedPeople", cascade = CascadeType.ALL)
     private List<Room> allowedRooms;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private Room room;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<RoomUser> roomUsers;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PublicMessage> publicMessages;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PrivateMessage> privateMessages;
 
     @PrePersist
