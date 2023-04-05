@@ -2,20 +2,17 @@ package com.astamatii.endava.webchat.services;
 
 import com.astamatii.endava.webchat.models.Icon;
 import com.astamatii.endava.webchat.repositories.IconRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class IconService {
     private final ResourceLoader resourceLoader;
     private final IconRepository iconRepository;
-
-    public IconService(ResourceLoader resourceLoader, IconRepository iconRepository) {
-        this.resourceLoader = resourceLoader;
-        this.iconRepository = iconRepository;
-    }
 
     public void saveIcon(Icon icon){
         iconRepository.save(icon);

@@ -26,9 +26,13 @@ public class Room {
 
     @NotNull
     @UniqueElements(message = "This room name is already taken")
-    @Size(min = 3, max = 30, message = "The room name must be between 3 and 30 letters in length")
-    @Column(unique = true, length = 30)
+    @Size(min = 3, max = 15, message = "The room name must be between 3 and 15 letters in length")
+    @Column(unique = true, length = 15)
     private String roomName;
+
+    @Size(max = 60, message = "The room description must be less than 60 letters long")
+    @Column(length = 60)
+    private String roomDescription;
 
     @ColumnDefault("false")
     private boolean onlyAllowedUsers;

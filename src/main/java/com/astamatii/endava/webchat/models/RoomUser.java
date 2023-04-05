@@ -26,8 +26,9 @@ public class RoomUser {
     @ColumnDefault("false")
     private boolean muted;
 
-    @Column(length = 10)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(15)")
+    private ChatRole chatRole;
 
     @ColumnDefault("now()")
     private ZonedDateTime joinedAt;

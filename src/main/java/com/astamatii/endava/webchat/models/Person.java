@@ -21,16 +21,15 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private City city;
-
-    @ManyToOne
-    private Language language;
+    @NotNull
+    @Size(min = 3, max = 30, message = "The name must be between 3 and 30 letters in length")
+    @Column(length = 30)
+    private String name;
 
     @NotNull
     @UniqueElements(message = "This username already exists")
-    @Size(min = 3, max = 20, message = "The username must be between 3 and 20 letters in length")
-    @Column(unique = true, length = 20)
+    @Size(min = 3, max = 15, message = "The username must be between 3 and 15 letters in length")
+    @Column(unique = true, length = 15)
     private String username;
 
     @NotNull
@@ -62,6 +61,12 @@ public class Person {
     @ColumnDefault("now()")
     private ZonedDateTime updatedAt;
 
+    @ManyToOne
+    private City city;
+
+    @ManyToOne
+    private Language language;
+
     @ManyToMany(mappedBy = "bannedPeople", cascade = CascadeType.ALL)
     private List<Room> bannedRooms;
     @ManyToMany(mappedBy = "allowedPeople", cascade = CascadeType.ALL)
@@ -78,6 +83,13 @@ public class Person {
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PrivateMessage> privateMessages;
+
+    public Person(String name, String username, String email, String password) {
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
 
     @PrePersist
     public void setDefaultOnPersist(){

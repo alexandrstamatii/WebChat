@@ -20,11 +20,11 @@ public class Language {
     private Long id;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, columnDefinition = "varchar(20)")
     private String languageName;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, columnDefinition = "varchar(5)")
     private String languageInitials;
 
 }
