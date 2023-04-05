@@ -61,6 +61,22 @@ public class Person {
     @ColumnDefault("now()")
     private ZonedDateTime updatedAt;
 
+    @ColumnDefault("now()")
+    private ZonedDateTime lastLoggedInAt;
+
+    @NotNull
+    @ColumnDefault("true")
+    private boolean nonLocked = true;
+
+    @NotNull
+    @ColumnDefault("true")
+    private boolean enabled = true;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(15) default 'ROLE_USER'")
+    private Role role;
+
     @ManyToOne
     private City city;
 

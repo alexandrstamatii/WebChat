@@ -28,7 +28,7 @@ public class RoomUser {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(15)")
-    private ChatRole chatRole;
+    private Role chatRole;
 
     @ColumnDefault("now()")
     private ZonedDateTime joinedAt;

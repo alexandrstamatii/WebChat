@@ -4,9 +4,12 @@ import com.astamatii.endava.webchat.models.Person;
 import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Collections;
 
 @RequiredArgsConstructor
 public class PersonDetails implements UserDetails {
@@ -14,7 +17,9 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(person.getRole().name());
+        return Collections.singletonList(authority);
     }
 
     @Override
@@ -29,12 +34,15 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        ZonedDateTime lastLoginDate = person.getLastLoggedInAt();
+        long logoutPeriodMonths = 12L;
+
+        return lastLoginDate.plusMonths(logoutPeriodMonths).isAfter(ZonedDateTime.now());
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return person.isNonLocked();
     }
 
     @Override
@@ -44,6 +52,6 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return person.isEnabled();
     }
 }
