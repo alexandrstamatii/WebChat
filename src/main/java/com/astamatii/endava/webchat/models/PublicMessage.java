@@ -24,6 +24,6 @@ public class PublicMessage {
 
     private String messageText;
 
-    @ColumnDefault("now()")
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime writtenAt;
 }

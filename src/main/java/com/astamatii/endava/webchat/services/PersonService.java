@@ -6,11 +6,11 @@ import com.astamatii.endava.webchat.utils.exceptions.PersonNotCreatedException;
 import com.astamatii.endava.webchat.utils.exceptions.PersonNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -43,26 +43,22 @@ public class PersonService {
     @Transactional
     public void updateProfile(Person person){
         Person updatedPerson = findById(person.getId());
-        person.setUsername(updatedPerson.getUsername());
-        person.setEmail(updatedPerson.getEmail());
-        person.setPassword(updatedPerson.getPassword());
+        updatedPerson.setLanguage(person.getLanguage());
+        updatedPerson.setCity(person.getCity());
+        updatedPerson.setTextColor(person.getTextColor());
+        updatedPerson.setDob(person.getDob());
+        updatedPerson.setName(person.getName());
         personRepository.save(person);
     }
 
+
+
     @Transactional
-    public void registerPerson(Person person) {
+    public void register(Person person) {
         verifyBeforePersist(person);
         String encodedPassword = passwordEncoder.encode(person.getPassword());
         person.setPassword(encodedPassword);
         personRepository.save(person);
-    }
-
-    @Transactional
-    public void updatePassword(Long id, String password) {
-        Person updatedPerson = findById(id);
-        String encodedPassword = passwordEncoder.encode(password);
-        updatedPerson.setPassword(encodedPassword);
-        personRepository.save(updatedPerson);
     }
 
     private void verifyBeforePersist(Person person){
@@ -70,7 +66,43 @@ public class PersonService {
             throw new PersonNotCreatedException("User with such username already exists");
         if(personRepository.findByUsername(person.getEmail()).isPresent())
             throw new PersonNotCreatedException("User with such email already exists");
-//        if(person.getPassword().length() < 8 || person.getPassword().length() > 30)
-//            throw new PersonNotCreatedException("Password should be between 8 and 30 characters in length");
     }
+
+    public void deletePerson(Person person) {
+        findById(person.getId());
+        personRepository.delete(person);
+    }
+
+//    @Transactional
+//    public void updateProfileByValues(Long id, String name, LocalDate dob, Long languageId,
+//                                      Long cityId, String textColor){
+//        Person updatedPerson = findById(id);
+//        personRepository.updateProfileByIdWithValues(id, name, dob, languageId, cityId, textColor);
+//    }
+//
+//    @Transactional
+//    public void updateProfileByPerson(Person person){
+//        Person updatedPerson = findById(person.getId());
+//        personRepository.updateProfileByIdWithPersonValues(person.getId(), person.getName(),person.getDob(),person.getLanguage(),
+//                person.getCity(), person.getTextColor());
+//    }
+//
+//    @Transactional
+//    public void updateEmail(Long id, String email){
+//        findById(id);
+//        personRepository.updateEmailById(id, email);
+//    }
+//
+//    public void updateUsername(Long id, String username){
+//        findById(id);
+//        personRepository.updateUsernameById(id, username);
+//    }
+//
+//    @Transactional
+//    public void updatePassword(Long id, String password) {
+//        findById(id);
+//        String encodedPassword = passwordEncoder.encode(password);
+//
+//        personRepository.updatePasswordById(id, encodedPassword);
+//    }
 }

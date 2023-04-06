@@ -27,10 +27,10 @@ public class RoomUser {
     private boolean muted;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(15)")
+    @Column(columnDefinition = "varchar(15) default 'ROLE_USER'")
     private Role chatRole;
 
-    @ColumnDefault("now()")
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime joinedAt;
 
     @OneToMany(cascade = CascadeType.ALL)

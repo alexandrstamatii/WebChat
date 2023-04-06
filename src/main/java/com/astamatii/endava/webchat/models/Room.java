@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -25,7 +24,6 @@ public class Room {
     private Person person;
 
     @NotNull
-    @UniqueElements(message = "This room name is already taken")
     @Size(min = 3, max = 15, message = "The room name must be between 3 and 15 letters in length")
     @Column(unique = true, length = 15)
     private String roomName;
@@ -41,9 +39,9 @@ public class Room {
 
     private String password;
 
-    @ColumnDefault("now()")
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime createdAt;
-    @ColumnDefault("now()")
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime updatedAt;
 
     @Min(0)
@@ -70,6 +68,10 @@ public class Room {
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<PrivateMessage> privateMessages;
+
+    public Room(Person person) {
+        this.person = person;
+    }
 
     @PreUpdate
     public void setDefaultOnUpdate(){

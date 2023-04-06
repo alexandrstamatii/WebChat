@@ -27,13 +27,11 @@ public class Person {
     private String name;
 
     @NotNull
-    @UniqueElements(message = "This username already exists")
     @Size(min = 3, max = 15, message = "The username must be between 3 and 15 letters in length")
     @Column(unique = true, length = 15)
     private String username;
 
     @NotNull
-    @UniqueElements(message = "This email already exists")
     @Email(message = "The email should look like this: your_email@email.com")
     @Column(unique = true, length = 30)
     private String email;
@@ -51,28 +49,30 @@ public class Person {
     @Column(columnDefinition = "varchar(10) default 'COLORED'")
     private Theme theme;
 
-    @Min(0)
+    @Column(columnDefinition = "int4 default 0")
     private int bannedCount;
-    @Min(0)
+
+    @Column(columnDefinition = "int4 default 0")
     private int messageCount;
 
-    @ColumnDefault("now()")
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime createdAt;
-    @ColumnDefault("now()")
+
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime updatedAt;
 
-    @ColumnDefault("now()")
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime lastLoggedInAt;
 
-    @NotNull
+    @ColumnDefault("CURRENT_TIMESTAMP(6)")
+    private ZonedDateTime lockExpiresAt;
+
     @ColumnDefault("true")
     private boolean nonLocked = true;
 
-    @NotNull
     @ColumnDefault("true")
     private boolean enabled = true;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(15) default 'ROLE_USER'")
     private Role role;
@@ -109,10 +109,20 @@ public class Person {
 
     @PrePersist
     public void setDefaultOnPersist(){
-        if (this.language == null) {
-            this.language = new Language();
-            this.language.setId(1L);
-        }
+//        if (this.language == null) {
+//            this.language = new Language();
+//            this.language.setId(1L);
+//        }
+
+        ZonedDateTime currentTime = ZonedDateTime.now();
+
+        this.enabled = true;
+        this.nonLocked = true;
+        this.createdAt = currentTime;
+        this.updatedAt = currentTime;
+        this.lastLoggedInAt = currentTime;
+        this.lockExpiresAt = currentTime;
+        this.role = Role.ROLE_USER;
     }
 
     @PreUpdate

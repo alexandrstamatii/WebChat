@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login Page</title>
+    <title>Register Page</title>
     <style>
 		body {
 			background-color: #222;
@@ -21,20 +21,30 @@
 		label {
 			display: block;
 			margin-bottom: 10px;
+			margin-top: 20px;
 		}
-		input[type="text"], input[type="password"] {
+		input[type="text"], input[type="password"], input[type="date"] {
 			display: block;
 			width: 100%;
 			padding: 10px;
 			border-radius: 20px;
 			border: none;
-			margin-bottom: 20px;
+			margin-bottom: 10px;
 			background-color: #444;
 			text-align: center;
 			color: #fff;
 			font-size: 16px;
 			line-height: 1.5;
 		}
+		 input[type="color"] {
+			display: block;
+			width: 100%;
+			border-radius: 10px;
+			border: none;
+			margin-bottom: 10px;
+			background-color: #444;
+		}
+
 		input[type="submit"], input[type="button"] {
 			display: inline-block;
 			padding: 10px 20px;
@@ -73,29 +83,27 @@
     </style>
 </head>
 <body>
-<form name="login" action="/login" method="POST">
-    <h1>Sign In</h1>
-    <label for="username">Username or Email:</label>
-    <input type="text" id="username" name="username" required>
-    <label for="password">Your Password:</label>
-    <input type="password" id="password" name="password" required>
-    <div th:if="${param.error}" style="color:red">Incorrect username, email or password</div>
-    <a href="/register" class="button">Sign Up</a>
-    <!--  <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
-    <input type="submit" value="Login">
+<form name="profile" th:action="@{/edit_profile}" th:method="GET" th:object="${person}">
+    <h1>Sign Up</h1>
+    <label for="name">Your Name:</label>
+    <div id="name" th:text="${person.name}" ></div>
+    <label for="username">Username:</label>
+    <div id="username" th:text="${person.username}" ></div>
+    <label for="email">Your Email:</label>
+    <div id="email" th:text="${person.email}" ></div>
+
+    <label for="dob">Date of Birth:</label>
+    <time id="dob" th:datetime="${#temporals.format(person.dob, 'yyyy/MM/dd')}" th:text="${#temporals.format(person.dob, 'dd.MM.yyyy')}"></time>
+<!--    <p th:text="${#temporals.format(person.dob, 'dd.MM.yyyy')}"></p>-->
+
+    <label for="textColor">Your message text color:</label>
+    <div id="textColor" th:style="'color: ' + ${person.textColor}">TEXT COLOR</div>
+
+    <a href="/home" class="button">Back</a>
+    <!--      <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
+    <input type="submit" value="Edit Profile">
 </form>
 
-<!--<form action="#" th:action="@{/login}" th:object="${loginForm}" method="POST">-->
-<!--  <label for="usernameEmail">Username/Email:</label>-->
-<!--  <input type="text" id="usernameEmail" th:field="*{usernameEmail}" required>-->
-<!--  <div th:if="${#fields.hasErrors('usernameEmail')}" th:errors="*{usernameEmail}" class="error-message"></div>-->
-
-<!--  <label for="password">Password:</label>-->
-<!--  <input type="password" id="password" th:field="*{password}" required>-->
-<!--  <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>-->
-<!--  <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
-<!--  <input type="submit" value="Login">-->
-<!--</form>-->
 
 </body>
 </html>

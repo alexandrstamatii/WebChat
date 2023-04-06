@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    /* CSS для стилизации страницы */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f1f1f1;
+    }
+
+    /* Форма для ввода логина и пароля */
+    .login-container {
+      margin: auto;
+      max-width: 400px;
+      padding: 10px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+    }
+
+    /* Стили для кнопок */
+    .button {
+      background-color: #4CAF50; /* Зеленый цвет */
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    /* Стили для ошибок */
+    .error {
+      color: #f44336;
+    }
+
+    </style>
+</head>
+<body>
+<h2 style="text-align:center;">Sign in</h2>
+<div class="login-container">
+    <form id="login-form" action="/auth/login" method="POST" onsubmit="submitForm(); return false;">
+        <div>
+            <label for="username">Username/Email:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+        <span class="error" th:if="${#fields.hasErrors('username')}">
+          <th:block th:errors="*{username}"></th:block>
+        </span>
+        </div>
+        <div>
+        <span class="error" th:if="${#fields.hasErrors('password')}">
+          <th:block th:errors="*{password}"></th:block>
+        </span>
+        </div>
+        <br>
+        <button type="submit" class="button">Login</button>
+    </form>
+    <div style="text-align:right;">
+        <span>or</span>
+        <a href="/auth/registration" class="button">Sign Up</a>
+    </div>
+</div>
+
+<script>
+    /* AJAX функция для отправки формы на сервер */
+    function submitForm() {
+      var form = document.getElementById("login-form");
+      var data = new FormData(form);
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            // Действия при успешной авторизации
+            console.log(xhr.responseText);
+          } else {
+            // Действия при ошибке авторизации
+            console.log(xhr.responseText);
+        }
+  };
+  xhr.open("POST", "/auth/login");
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  var json = JSON.stringify({
+    "username": data.get("username"),
+    "password": data.get("password")
+  });
+  xhr.send(json);
+}
+
+</script>
+</body>
+</html>

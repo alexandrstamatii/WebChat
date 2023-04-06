@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Service
@@ -19,15 +20,17 @@ public class PersonDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        Optional<Person> person = personRepository.findByUsername(usernameOrEmail);
+        Optional<Person> personOptional = personRepository.findByUsername(usernameOrEmail);
 
-        if(person.isEmpty())
-            person = personRepository.findByEmail(usernameOrEmail);
-        if(person.isEmpty())
+        if(personOptional.isEmpty())
+            personOptional = personRepository.findByEmail(usernameOrEmail);
+        if(personOptional.isEmpty())
             throw new UsernameNotFoundException("User by this username or email not found");
 
+        Person person = personOptional.get();
+        person.setLastLoggedInAt(ZonedDateTime.now());
+        personRepository.save(person);
 
-
-        return new PersonDetails(person.get());
+        return new PersonDetails(person);
     }
 }

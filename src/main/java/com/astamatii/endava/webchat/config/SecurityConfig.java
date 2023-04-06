@@ -24,14 +24,16 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/room/admin*").hasRole("ADMIN")
                         .requestMatchers("/room/moderator*").hasRole("MODERATOR")
-                        .requestMatchers("/","/login*", "/register", "/error").permitAll()
+                        .requestMatchers("/login*", "/register*", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form
-                        .loginPage("/auth/login")
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/home")
                         .failureUrl("/login?error=true")
                         .permitAll()

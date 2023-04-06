@@ -2,6 +2,7 @@ package com.astamatii.endava.webchat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,11 @@ public class WebChatApplication implements WebMvcConfigurer {
 	public ObjectMapper objectMapper() {
 		JavaTimeModule module = new JavaTimeModule();
 		return new ObjectMapper().registerModule(module);
+	}
+
+	@Bean
+	public ModelMapper modelMapper(){
+		return new ModelMapper();
 	}
 }
 
