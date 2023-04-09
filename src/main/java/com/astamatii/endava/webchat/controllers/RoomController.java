@@ -67,7 +67,7 @@ public class RoomController {
     }
 
     @ExceptionHandler
-    private ResponseEntity<ExceptionResponse> handleException (NoChatRoomsException e){
+    private ResponseEntity<ExceptionResponse> handleException (ChatRoomsDoNotExistException e){
         ExceptionResponse response = new ExceptionResponse(e.getMessage(), ZonedDateTime.now());
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

@@ -83,34 +83,44 @@
     </style>
 </head>
 <body>
-<form name="register" th:action="@{/register}" th:method="POST" th:object="${person}">
-    <h1>Sign Up</h1>
+<form name="profile" th:action="@{/edit_profile}" th:method="PATCH" th:object="${profile_dto}">
+    <h1>Edit Profile</h1>
     <label for="name">Your Name:</label>
     <input type="text" id="name" name="name" th:field="*{name}" required>
     <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></div>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" th:field="*{username}" required>
-    <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red"></div>
-    <label for="email">Your Email:</label>
-    <input type="text" id="email" name="email" th:field="*{email}" required>
-    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></div>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></div>
-    <label for="confirm-password">Confirm Password:</label>
-    <input type="password" id="confirm-password" name="confirmPassword" required>
-    <div id="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
     <label for="dob">Date of Birth:</label>
     <input type="date" id="dob" name="dob" th:field="*{dob}" required>
     <div th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}" style="color:red"></div>
     <label for="textColor">Your message text color:</label>
     <input type="color" id="textColor" name="textColor" th:field="*{textColor}" required>
     <div th:if="${#fields.hasErrors('textColor')}" th:errors="*{textColor}" style="color:red"></div>
+    <a href="/profile" class="button">Back</a>
+    <input type="submit" value="Change profile">
+</form>
 
-    <div th:if="${#fields.hasErrors('enabled')}" th:errors="*{enabled}" style="color:red"></div>
-    <a href="/login" class="button">Sign In</a>
-    <!--      <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
-    <input type="submit" value="Register">
+<form name="register" th:action="@{/edit_profile}" th:method="PATCH" th:object="${profile_dto}">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" th:field="*{username}" required>
+    <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red"></div>
+    <input type="submit" value="Change Username">
+</form>
+
+<form name="register" th:action="@{/edit_profile}" th:method="PATCH" th:object="${profile_dto}">
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" th:field="*{email}" required>
+    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></div>
+    <input type="submit" value="Change Email">
+</form>
+
+<form name="register" th:action="@{/edit_profile}" th:method="PATCH" th:object="${profile_dto}">
+    <label for="email">Change Password:</label>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></div>
+        <label for="confirm-password">Confirm Password:</label>
+        <input type="password" id="confirm-password" name="confirmPassword" required>
+        <div id="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
+    <input type="submit" value="Change Password">
 </form>
 
 <script>

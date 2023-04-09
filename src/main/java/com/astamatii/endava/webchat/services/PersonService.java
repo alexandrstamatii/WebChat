@@ -2,15 +2,12 @@ package com.astamatii.endava.webchat.services;
 
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.repositories.PersonRepository;
-import com.astamatii.endava.webchat.utils.exceptions.PersonNotCreatedException;
-import com.astamatii.endava.webchat.utils.exceptions.PersonNotFoundException;
+import com.astamatii.endava.webchat.utils.exceptions.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -22,50 +19,42 @@ public class PersonService {
     @Transactional
     public Person findById(Long id){
         Optional<Person> personOptional = personRepository.findById(id);
-
-        return personOptional.orElseThrow(() -> new PersonNotFoundException("Person with this id not found"));
+        return personOptional.orElseThrow(PersonIdNotFoundException::new);
     }
 
     @Transactional
     public Person findByUsername(String username){
         Optional<Person> personOptional = personRepository.findByUsername(username);
-
-        return personOptional.orElseThrow(() -> new PersonNotFoundException("Person with this username not found"));
+        return personOptional.orElseThrow(PersonUsernameNotFoundException::new);
     }
 
     @Transactional
     public Person findByEmail(String email){
         Optional<Person> personOptional = personRepository.findByEmail(email);
-
-        return personOptional.orElseThrow(() -> new PersonNotFoundException("Person with this email not found"));
+        return personOptional.orElseThrow(PersonEmailNotFoundException::new);
     }
 
     @Transactional
     public void updateProfile(Person person){
-        Person updatedPerson = findById(person.getId());
-        updatedPerson.setLanguage(person.getLanguage());
-        updatedPerson.setCity(person.getCity());
-        updatedPerson.setTextColor(person.getTextColor());
-        updatedPerson.setDob(person.getDob());
-        updatedPerson.setName(person.getName());
+//        Person updatedPerson = findById(person.getId());
+////        updatedPerson.setLanguage(person.getLanguage());
+////        updatedPerson.setCity(person.getCity());
+////        updatedPerson.setTextColor(person.getTextColor());
+////        updatedPerson.setDob(person.getDob());
+////        updatedPerson.setName(person.getName());
         personRepository.save(person);
     }
-
-
 
     @Transactional
     public void register(Person person) {
-        verifyBeforePersist(person);
+        if(verifyUsernameExistence(person))
+            throw new PersonUsernameExistsException();
+        if(verifyEmailExistence(person))
+            throw new PersonEmailExistsException();
+
         String encodedPassword = passwordEncoder.encode(person.getPassword());
         person.setPassword(encodedPassword);
         personRepository.save(person);
-    }
-
-    private void verifyBeforePersist(Person person){
-        if(personRepository.findByUsername(person.getUsername()).isPresent())
-            throw new PersonNotCreatedException("User with such username already exists");
-        if(personRepository.findByUsername(person.getEmail()).isPresent())
-            throw new PersonNotCreatedException("User with such email already exists");
     }
 
     public void deletePerson(Person person) {
@@ -73,6 +62,13 @@ public class PersonService {
         personRepository.delete(person);
     }
 
+    private boolean verifyUsernameExistence(Person person){
+        return personRepository.findByUsername(person.getUsername()).isPresent();
+    }
+
+    private boolean verifyEmailExistence(Person person){
+        return personRepository.findByEmail(person.getEmail()).isPresent();
+    }
 //    @Transactional
 //    public void updateProfileByValues(Long id, String name, LocalDate dob, Long languageId,
 //                                      Long cityId, String textColor){

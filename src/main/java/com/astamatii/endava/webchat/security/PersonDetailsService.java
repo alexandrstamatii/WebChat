@@ -1,4 +1,4 @@
-package com.astamatii.endava.webchat.services;
+package com.astamatii.endava.webchat.security;
 
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.repositories.PersonRepository;

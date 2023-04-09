@@ -1,6 +1,7 @@
 package com.astamatii.endava.webchat.config;
 
-import com.astamatii.endava.webchat.services.PersonDetailsService;
+import com.astamatii.endava.webchat.security.PersonAuthenticationSuccessHandler;
+import com.astamatii.endava.webchat.security.PersonDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig{
     private final PersonDetailsService personDetailsService;
+    private final PersonAuthenticationSuccessHandler personAuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,6 +36,7 @@ public class SecurityConfig{
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
+//                        .successHandler(personAuthenticationSuccessHandler)
                         .defaultSuccessUrl("/home")
                         .failureUrl("/login?error=true")
                         .permitAll()
