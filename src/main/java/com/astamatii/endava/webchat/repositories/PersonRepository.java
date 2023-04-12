@@ -16,6 +16,7 @@ import java.util.Optional;
 public interface PersonRepository extends JpaRepository<Person, Long> {
     Optional<Person> findByUsername(String username);
     Optional<Person> findByEmail(String email);
+    void deleteByUsername(String username);
 
 //    @Modifying
 //    @Query("INSERT INTO Person (name, username, email, password) VALUES (:name, :username, :password, :email)")

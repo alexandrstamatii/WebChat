@@ -17,7 +17,7 @@ import java.util.Optional;
 public class RoomService {
     private final RoomRepository roomRepository;
 
-    public List<Room> findAll(){
+    public List<Room> findAll() throws ChatRoomsDoNotExistException {
         List<Room> list = roomRepository.findAll();
         if(list.isEmpty())
             throw new ChatRoomsDoNotExistException();
@@ -25,14 +25,14 @@ public class RoomService {
     }
 
     @Transactional
-    public Room findByRoomName(String roomName){
+    public Room findByRoomName(String roomName) throws RoomNameNotFound {
         Optional<Room> roomOptional = roomRepository.findByRoomName(roomName);
 
         return roomOptional.orElseThrow(RoomNameNotFound::new);
     }
 
     @Transactional
-    public void createRoom(Room room){
+    public void createRoom(Room room) throws RoomNameExistsException {
         if(verifyRoomNameExistence(room))
             throw new RoomNameExistsException();
 

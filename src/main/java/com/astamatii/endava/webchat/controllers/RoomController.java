@@ -37,15 +37,21 @@ public class RoomController {
     @ResponseBody
     @GetMapping("/get_rooms")
     public ResponseEntity<List<RoomInfoDto>> getRooms(){
-        List<RoomInfoDto> response = roomService.findAll().stream().map(room -> modelMapper.map(room, RoomInfoDto.class)).toList();
+        List<RoomInfoDto> response = null;
+        try {
+            response = roomService.findAll().stream().map(room -> modelMapper.map(room, RoomInfoDto.class)).toList();
+        } catch (ChatRoomsDoNotExistException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/create_room")
-    public String createRoomPage(Model model){
+    public String createRoomPage(Model model) throws PersonUsernameNotFoundException {
         String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        Person person = personService.findByUsername(username);
+        Person person = null;
+        person = personService.findByUsername(username);
         model.addAttribute("room", new Room());
         model.addAttribute("personId", person.getId());
         return "room/create_room";
