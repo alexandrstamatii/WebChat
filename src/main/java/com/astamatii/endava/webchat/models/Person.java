@@ -22,21 +22,28 @@ public class Person {
     private Long id;
 
     @NotNull
+    @NotBlank(message = "The name should not be blank")
+    @NotEmpty(message = "The name should not be empty")
     @Size(min = 3, max = 30, message = "The name must be between 3 and 30 letters in length")
     @Column(length = 30)
     private String name;
 
     @NotNull
+    @NotBlank(message = "The username should not be blank")
+    @NotEmpty(message = "The username should not be empty")
     @Size(min = 3, max = 15, message = "The username must be between 3 and 15 letters in length")
     @Column(unique = true, length = 15)
     private String username;
 
     @NotNull
+    @NotBlank(message = "email should not be blank")
+    @NotEmpty(message = "email should not be empty")
     @Email(message = "The email should look like this: your_email@email.com")
     @Column(unique = true, length = 30)
     private String email;
 
     @NotNull
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.")
     private String password;
 
     //@DateTimeFormat(pattern = "dd.MM.yyyy") //throws DateTimeParseException ("Date format should be dd.MM.yyyy")
@@ -48,6 +55,12 @@ public class Person {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(10) default 'COLORED'")
     private Theme theme;
+
+    @ManyToOne
+    private City city;
+
+    @ManyToOne
+    private Language language;
 
     @Column(columnDefinition = "int4 default 0")
     private int bannedCount;
@@ -76,12 +89,6 @@ public class Person {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(15) default 'ROLE_USER'")
     private Role role;
-
-    @ManyToOne
-    private City city;
-
-    @ManyToOne
-    private Language language;
 
     @ManyToMany(mappedBy = "bannedPeople", cascade = CascadeType.ALL)
     private List<Room> bannedRooms;
@@ -127,12 +134,6 @@ public class Person {
 
     @PreUpdate
     public void setDefaultOnUpdate() {
-        if (this.textColor == null) {
-            textColor = "#000000";
-        }
-        if (this.theme == null) {
-            this.theme = Theme.COLORED;
-        }
-        this.updatedAt = ZonedDateTime.now();
+
     }
 }

@@ -40,7 +40,7 @@ public class RoomController {
         List<RoomInfoDto> response = null;
         try {
             response = roomService.findAll().stream().map(room -> modelMapper.map(room, RoomInfoDto.class)).toList();
-        } catch (ChatRoomsDoNotExistException e) {
+        } catch (ChatRoomsNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -48,10 +48,10 @@ public class RoomController {
     }
 
     @GetMapping("/create_room")
-    public String createRoomPage(Model model) throws PersonUsernameNotFoundException {
+    public String createRoomPage(Model model) throws UsernameNotFoundException {
         String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         Person person = null;
-        person = personService.findByUsername(username);
+        person = personService.findUserByUsername(username);
         model.addAttribute("room", new Room());
         model.addAttribute("personId", person.getId());
         return "room/create_room";
@@ -64,7 +64,7 @@ public class RoomController {
         }
         try {
             roomService.createRoom(room);
-        } catch (RoomNotCreatedException e) {
+        } catch (RoomNameExistsException e) {
             bindingResult.rejectValue("enabled", "",e.getMessage());
             return "room/create_room";
         }
@@ -73,7 +73,7 @@ public class RoomController {
     }
 
     @ExceptionHandler
-    private ResponseEntity<ExceptionResponse> handleException (ChatRoomsDoNotExistException e){
+    private ResponseEntity<ExceptionResponse> handleException (ChatRoomsNotFoundException e){
         ExceptionResponse response = new ExceptionResponse(e.getMessage(), ZonedDateTime.now());
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

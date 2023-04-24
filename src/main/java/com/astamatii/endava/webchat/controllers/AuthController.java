@@ -2,17 +2,14 @@ package com.astamatii.endava.webchat.controllers;
 
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.services.PersonService;
-import com.astamatii.endava.webchat.utils.exceptions.PersonEmailExistsException;
-import com.astamatii.endava.webchat.utils.exceptions.PersonNotCreatedException;
-import com.astamatii.endava.webchat.utils.exceptions.PersonUsernameExistsException;
+import com.astamatii.endava.webchat.utils.exceptions.EmailExistsException;
+import com.astamatii.endava.webchat.utils.exceptions.UsernameExistsException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -33,16 +30,15 @@ public class AuthController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
-            return "auth/register";
-        }
         try {
-            personService.register(person);
-        } catch (PersonUsernameExistsException e) {
+            personService.registerUser(person);
+        } catch (UsernameExistsException e) {
             bindingResult.rejectValue("username", "",e.getMessage());
-            return "auth/register";
-        } catch (PersonEmailExistsException e) {
+        } catch (EmailExistsException e) {
             bindingResult.rejectValue("email", "",e.getMessage());
+        }
+
+        if (bindingResult.hasErrors()) {
             return "auth/register";
         }
 

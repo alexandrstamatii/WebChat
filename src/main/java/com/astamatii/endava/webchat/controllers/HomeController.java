@@ -1,16 +1,12 @@
 package com.astamatii.endava.webchat.controllers;
 
-import com.astamatii.endava.webchat.dto.ProfileDto;
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.security.PersonDetails;
 import com.astamatii.endava.webchat.services.PersonService;
-import com.astamatii.endava.webchat.utils.exceptions.PersonEmailExistsException;
-import com.astamatii.endava.webchat.utils.exceptions.PersonNotFoundException;
-import com.astamatii.endava.webchat.utils.exceptions.PersonUsernameExistsException;
-import com.astamatii.endava.webchat.utils.exceptions.PersonUsernameNotFoundException;
+import com.astamatii.endava.webchat.utils.exceptions.EmailExistsException;
+import com.astamatii.endava.webchat.utils.exceptions.UsernameExistsException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -19,7 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,92 +23,96 @@ public class HomeController {
     private final PersonService personService;
     private final ModelMapper modelMapper;
 
-    @ModelAttribute("profile_dto")
-    public ProfileDto profileDto() throws PersonUsernameNotFoundException {
-        String username = ((PersonDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        ProfileDto profileDto = modelMapper.map(personService.findByUsername(username), ProfileDto.class);
-        return profileDto;
-    }
+//    @ModelAttribute("profile_dto")
+//    public ProfileDto profileDto() throws UsernameNotFoundException {
+//        String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+//        ProfileDto profileDto = modelMapper.map(personService.findUserByUsername(username), ProfileDto.class);
+//        return profileDto;
+//    }
 
     @GetMapping("/")
-    public String redirectHomePage(){
+    public String redirectHomePage() {
         return "redirect:/home";
     }
 
-//    @GetMapping("/home")
-//    public String homePage(Model model){
-//        String username = ((PersonDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-//        model.addAttribute("personName", personService.findByUsername(username).getName());
-//        return "home/home";
-//    }
-
-//    @GetMapping("/profile")
-//    public String profilePage(Model model){
-//        String username = ((PersonDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-//        model.addAttribute("person", personService.findByUsername(username));
-//        return "home/profile";
-//    }
-
     @GetMapping("/home")
-    public String homePage(){
+    public String homePage(Model model) {
+        String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        model.addAttribute("name", personService.findUserByUsername(username).getName());
         return "home/home";
     }
 
     @GetMapping("/profile")
-    public String profilePage(){
+    public String profilePage(Model model) {
+        String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        model.addAttribute("user", personService.findUserByUsername(username));
         return "home/profile";
     }
 
     @GetMapping("/edit_profile")
-    public String editProfilePage(Model model){
-        model.addAttribute("current_password", "");
+    public String editProfilePage(Model model) {
+        String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        model.addAttribute("user", personService.findUserByUsername(username));
+//        model.addAttribute("password-check", "");
 
         return "home/edit_profile";
     }
 
-    @PatchMapping("/edit_profile")
-    public String updateProfile(@ModelAttribute("profile_dto") @Valid ProfileDto profileDto,
-                                @ModelAttribute("current_password") String currentPassword, BindingResult bindingResult) throws PersonUsernameNotFoundException {
-        String username = ((PersonDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        Person person = personService.findByUsername(username);
+    @PostMapping("/edit_profile")
+    public String updateProfile(@ModelAttribute("user") @Valid Person updatedUser,
+            /*@ModelAttribute("password-check") String enteredPassword,*/
+                                BindingResult bindingResult) {
+        String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        Person currentUser = personService.findUserByUsername(username);
 
-        System.out.println("ATTENTION HERE 1 --->>>" + person);
+        //Handling Validation. In order to make possible of updating with ignoring empty fields.
+        if (personService.checkIfNotBlankOrEmpty(updatedUser.getName()))
+            if (bindingResult.hasFieldErrors("name")) return "home/edit_profile";
+            else if (personService.checkIfNotBlankOrEmpty(updatedUser.getUsername())) {
+                try {
+                    if (!updatedUser.getUsername().equals(currentUser.getUsername()))
+                        personService.findUserExistenceByUsername(updatedUser.getUsername());
+                } catch (UsernameExistsException e) {
+                    bindingResult.rejectValue("username", "", e.getMessage());
+                }
 
-        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-        modelMapper.map(profileDto, person);
+                if (bindingResult.hasFieldErrors("username")) return "home/edit_profile";
+            } else if (personService.checkIfNotBlankOrEmpty(updatedUser.getEmail())) {
+                try {
+                    if (!updatedUser.getEmail().equals(currentUser.getEmail()))
+                        personService.findUserExistenceByEmail(updatedUser.getEmail());
+                } catch (EmailExistsException e) {
+                    bindingResult.rejectValue("email", "", e.getMessage());
+                }
 
-        System.out.println("ATTENTION HERE 2 --->>>" + person);
+                if (bindingResult.hasFieldErrors("email")) return "home/edit_profile";
+            } else if (personService.checkIfNotBlankOrEmpty(updatedUser.getPassword()))
+                if (bindingResult.hasFieldErrors("password")) return "home/edit_profile";
 
-        System.out.println("ATTENTION HERE 3 --->>>" + profileDto);
+        if (true/*personService.passwordCheck(enteredPassword, username)*/) {
 
-        if (bindingResult.hasErrors()) {
-            return "auth/edit_profile";
+            personService.updateUser(updatedUser, username);
+            return "redirect:/profile";
         }
+//        bindingResult.rejectValue("password-check", "", "You`ve entered a wrong password");
 
-//        try{
-//            personService.confirmByPassword(currentPassword, username);
-//        } catch (PersonUsernameNotFoundException e) {
-//            bindingResult.rejectValue("current_password", "",e.getMessage());
-//            return "auth/register";
-//        }
-
-        if(personService.verifyUsernameExistence(person)) {
-            bindingResult.rejectValue("username", "", "This username already exists");
-            return "auth/edit_profile";
-        }
-        if(personService.verifyEmailExistence(person)) {
-            bindingResult.rejectValue("email", "", "This email already exists");
-            return "auth/edit_profile";
-        }
-
-        personService.updatePerson(person);
-        return "redirect:/edit_profile";
+        return "home/edit_profile";
     }
 
-    @DeleteMapping("/edit_profile")
-    public String deleteProfile(){
-        String username = ((PersonDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        personService.deletePerson(username);
-        return "redirect:/profile";
+    @PostMapping("/delete")
+    public String deleteProfile(/*@ModelAttribute("password_check") String enteredPassword,
+                                BindingResult bindingResult*/) {
+
+        String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+        if (true/*personService.passwordCheck(enteredPassword, username)*/) {
+
+            personService.deleteUser(username);
+            return "redirect:/logout";
+        }
+
+//        bindingResult.rejectValue("password-check", "", "You`ve entered a wrong password");
+
+        return "home/edit_profile";
     }
 }

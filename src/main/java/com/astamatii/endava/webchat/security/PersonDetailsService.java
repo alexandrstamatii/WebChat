@@ -20,17 +20,17 @@ public class PersonDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        Optional<Person> personOptional = personRepository.findByUsername(usernameOrEmail);
+        Optional<Person> userOptional = personRepository.findByUsername(usernameOrEmail);
 
-        if(personOptional.isEmpty())
-            personOptional = personRepository.findByEmail(usernameOrEmail);
-        if(personOptional.isEmpty())
+        if(userOptional.isEmpty())
+            userOptional = personRepository.findByEmail(usernameOrEmail);
+        if(userOptional.isEmpty())
             throw new UsernameNotFoundException("User by this username or email not found");
 
-        Person person = personOptional.get();
-        person.setLastLoggedInAt(ZonedDateTime.now());
-        personRepository.save(person);
+        Person user = userOptional.get();
+        user.setLastLoggedInAt(ZonedDateTime.now());
+        personRepository.save(user);
 
-        return new PersonDetails(person);
+        return new PersonDetails(user);
     }
 }

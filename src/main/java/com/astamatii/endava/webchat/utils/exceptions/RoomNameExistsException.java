@@ -1,7 +1,7 @@
 package com.astamatii.endava.webchat.utils.exceptions;
 
-public class RoomNameExistsException extends RoomNotCreatedException {
+public class RoomNameExistsException extends ResourceExistsException {
     public RoomNameExistsException() {
-        super("Room with such name already exists");
+        super("This room name  is already taken");
     }
 }

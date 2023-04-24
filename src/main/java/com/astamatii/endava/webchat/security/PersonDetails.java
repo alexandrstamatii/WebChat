@@ -13,28 +13,28 @@ import java.util.Collections;
 
 @RequiredArgsConstructor
 public class PersonDetails implements UserDetails {
-    private final Person person;
+    private final Person user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(person.getRole().name());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
         return Collections.singletonList(authority);
     }
 
     @Override
     public String getPassword() {
-        return this.person.getPassword();
+        return this.user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.person.getUsername();
+        return this.user.getUsername();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        ZonedDateTime lastLoginDate = person.getLastLoggedInAt();
+        ZonedDateTime lastLoginDate = user.getLastLoggedInAt();
         long logoutPeriodMonths = 12L;
 
         return lastLoginDate.plusMonths(logoutPeriodMonths).isAfter(ZonedDateTime.now());
@@ -42,7 +42,7 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return person.isNonLocked();
+        return user.isNonLocked();
     }
 
     @Override
@@ -52,6 +52,6 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return person.isEnabled();
+        return user.isEnabled();
     }
 }

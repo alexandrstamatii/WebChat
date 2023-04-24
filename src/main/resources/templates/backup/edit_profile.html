@@ -12,7 +12,7 @@
 			line-height: 1.5;
 			text-align: center;
 		}
-		#update {
+		.profile {
 			display: inline-block;
 			width: min-content;
             min-width: 300px;
@@ -21,7 +21,7 @@
 			border-radius: 10px;
 			margin-top: 50px;
 		}
-		#delete {
+		.block {
 			display: inline-block;
 			width: min-content;
             min-width: 300px;
@@ -98,7 +98,7 @@
 			cursor:pointer;
 		}
 
-		#delete_button {
+		.open-popup {
 		    display: inline-block;
 		    position: relative;
 		    width: 200px;
@@ -138,66 +138,109 @@
 </head>
 <body>
 
-<form id="update" name="update" th:action="@{/edit_profile}" th:method="POST" th:object="${user}">
-    <h1>Update your profile</h1>
-    <h4 style="color:green">Empty fields will be ignored</h4>
-
+<form class="profile" name="profile" th:action="@{/edit_profile}" th:method="PATCH" th:object="${profile_dto}">
+    <h1>Edit Profile</h1>
     <label for="name">Your Name:</label>
     <input type="text" id="name" name="name" th:field="*{name}">
     <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></div>
-
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" th:field="*{username}">
-    <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red"></div>
-
-    <label for="email">Your Email:</label>
-    <input type="text" id="email" name="email" th:field="*{email}">
-    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></div>
-
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password">
-    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></div>
-
-    <label for="confirm-password">Confirm Password:</label>
-    <input type="password" id="confirm-password" name="confirmPassword">
-    <div id="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
-
     <label for="dob">Date of Birth:</label>
-    <input type="date" id="dob" name="dob" th:field="*{dob}" pattern="\d{2}/\d{2}/\d{4}">
+    <input type="date" id="dob" name="dob" th:field="*{dob}">
     <div th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}" style="color:red"></div>
-
     <label for="textColor">Your message text color:</label>
     <input type="color" id="textColor" name="textColor" th:field="*{textColor}">
     <div th:if="${#fields.hasErrors('textColor')}" th:errors="*{textColor}" style="color:red"></div>
-
-<!--    <label for="password-check">Password:</label>-->
-<!--    <input type="password" id="password-check" name="password-check" th:value="${password-check}">-->
-<!--    <div th:if="${#fields.hasErrors('password-check')}" th:errors="${password-check}" style="color:red"></div>-->
-
     <a href="/profile" class="button">Back</a>
-    <input type="submit" value="Update">
+    <input type="submit" value="Update settings">
 </form>
 <br/>
-<form id="delete" name="delete" th:action="@{/delete}" th:method="POST">
-    <h3 style="color:red">Delete your account:</h3>
-    <!--    <label for="password-check">Password:</label>-->
-    <!--    <input type="password" id="password-check" name="password-check" th:value="${password-check}">-->
-    <!--    <div th:if="${#fields.hasErrors('password-check')}" th:errors="${password-check}" style="color:red"></div>-->
-    <input type="submit" id="delete_button" value="Delete Account">
-</form>
-<!--<div id="delete">-->
-<!--    <h3 style="color:green">Empty fields will be ignored</h3>-->
+<div class="block">
+    <p>
+        <input type="button" class="open-popup" data-popup="popup-username" value="Change username">
+    </p>
+    <p>
+        <input type="button" class="open-popup" data-popup="popup-email" value="Change email">
+    </p>
+    <p>
+        <input type="button" class="open-popup" data-popup="popup-password" value="Change password">
+    </p>
+</div>
 
-<!--    <p>-->
-<!--        <input type="button" class="open-popup" data-popup="popup-username" value="Change username">-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <input type="button" class="open-popup" data-popup="popup-email" value="Change email">-->
-<!--    </p>-->
-<!--    <p>-->
-<!--        <input type="button" class="open-popup" data-popup="popup-password" value="Change password">-->
-<!--    </p>-->
-<!--</div>-->
+<br/>
+<div class="overlay" id="popup-username">
+    <form class="popup" name="username" th:action="@{/edit_profile}" th:method="PATCH"
+          th:object="${profile_dto}">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" th:field="*{username}" required>
+        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red"></div>
+        <label>Current password to confirm:</label>
+        <input type="password" name="current_password" th:field="${current_password}" required>
+        <div th:errors="${current_password}" style="color:red"></div>
+        <input type="button" class="cancel" value="Cancel">
+        <input type="submit" value="Change Username">
+    </form>
+</div>
+<br/>
+<div class="overlay" id="popup-email">
+    <form class="popup" name="email" th:action="@{/edit_profile}" th:method="PATCH"
+          th:object="${profile_dto}">
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" th:field="*{email}" required>
+        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></div>
+        <label>Current password to confirm:</label>
+        <input type="password" name="current_password" th:field="${current_password}" required>
+        <div th:errors="${current_password}" style="color:red"></div>
+        <input type="button" class="cancel" value="Cancel">
+        <input type="submit" value="Change Email">
+    </form>
+</div>
+<br/>
+<div class="overlay" id="popup-password">
+    <form class="popup" name="password" th:action="@{/edit_profile}" th:method="PATCH"
+          th:object="${profile_dto}">
+        <label for="password">New Password:</label>
+        <input type="password" id="password" name="password" required>
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></div>
+        <label for="confirm-password">Verify new Password:</label>
+        <input type="password" id="confirm-password" name="confirmPassword" required>
+        <div id="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
+        <label>Current password to confirm:</label>
+        <input type="password" name="current_password" th:field="${current_password}" required>
+        <div th:errors="${current_password}" style="color:red"></div>
+        <input type="button" class="cancel" value="Cancel">
+        <input type="submit" value="Change Password">
+    </form>
+</div>
+<br/>
+
+<!--<label for="current_password">Type current password to confirm changes:</label>-->
+<!--<input type="password" id="current_password" name="current_password" required>-->
+
+<script>
+	var popupsToggle = document.querySelectorAll('.open-popup'),
+		popupClose = document.querySelectorAll('.cancel');
+
+    popupsToggle.forEach(function(item) {
+        item.addEventListener('click', function() {
+            var popupName = item.getAttribute('data-popup');
+            document.getElementById(popupName).style.display = "inline-block";
+        })
+    });
+
+    popupClose.forEach(function(item) {
+        item.addEventListener ('click', function() {
+            var popup = item.closest('.overlay');
+            popup.style.display = "none";
+        })
+    });
+
+	window.onclick = function(e) {
+		if (e.target.classList.contains('overlay')) {
+			e.target.style.display = "none";
+		}
+	}
+
+
+</script>
 
 <script>
   var password = document.getElementById("password");

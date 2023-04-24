@@ -25,13 +25,13 @@ public class PersonAuthenticationSuccessHandler implements AuthenticationSuccess
                                         Authentication authentication) throws IOException, ServletException {
 
         String username = authentication.getName();
-        Optional<Person> personOptional = personRepository.findByUsername(username);
-        if(personOptional.isEmpty())
+        Optional<Person> userOptional = personRepository.findByUsername(username);
+        if(userOptional.isEmpty())
             throw new UsernameNotFoundException("User by this username not found");
 
-        Long personId = personOptional.get().getId(); // retrieve user ID from the principal
+        Long userId = userOptional.get().getId(); // retrieve user ID from the principal
 
-        Cookie idCookie = new Cookie("user_id", String.valueOf(personId));
+        Cookie idCookie = new Cookie("user_id", String.valueOf(userId));
         idCookie.setMaxAge(3600);
         idCookie.setSecure(true);
         idCookie.setHttpOnly(true);

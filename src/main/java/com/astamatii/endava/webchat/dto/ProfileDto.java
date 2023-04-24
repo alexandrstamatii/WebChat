@@ -4,10 +4,7 @@ import com.astamatii.endava.webchat.models.City;
 import com.astamatii.endava.webchat.models.Language;
 import com.astamatii.endava.webchat.models.Theme;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -18,14 +15,21 @@ import java.time.ZonedDateTime;
 public class ProfileDto {
 
     @Size(min = 3, max = 30, message = "The name must be between 3 and 30 letters in length")
+    @NotBlank(message = "The name should not be blank")
+    @NotEmpty(message = "The name should not be empty")
     private String name;
 
     @Size(min = 3, max = 15, message = "The username must be between 3 and 15 letters in length")
+    @NotBlank(message = "The username should not be blank")
+    @NotEmpty(message = "The username should not be empty")
     private String username;
 
     @Email(message = "The email should look like this: your_email@email.com")
+    @NotBlank(message = "email should not be blank")
+    @NotEmpty(message = "email should not be empty")
     private String email;
 
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.")
     private String password;
 
     private LocalDate dob;

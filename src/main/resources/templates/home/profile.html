@@ -85,19 +85,21 @@
 <body>
 <form name="profile" th:action="@{/edit_profile}" th:method="GET">
     <h1>Sign Up</h1>
+
     <label for="name">Your Name:</label>
-    <div id="name" th:text="${profile_dto.name}" ></div>
+    <div id="name" th:text="${user.name}" ></div>
+
     <label for="username">Username:</label>
-    <div id="username" th:text="${profile_dto.username}" ></div>
+    <div id="username" th:text="${user.username}" ></div>
+
     <label for="email">Your Email:</label>
-    <div id="email" th:text="${profile_dto.email}" ></div>
+    <div id="email" th:text="${user.email}" ></div>
 
     <label for="dob">Date of Birth:</label>
-    <time id="dob" th:datetime="${#temporals.format(profile_dto.dob, 'yyyy/MM/dd')}" th:text="${#temporals.format(profile_dto.dob, 'dd.MM.yyyy')}"></time>
-<!--    <p th:text="${#temporals.format(person.dob, 'dd.MM.yyyy')}"></p>-->
+    <time id="dob" th:datetime="${#temporals.format(user.dob, 'yyyy/MM/dd')}" th:text="${#temporals.format(user.dob, 'dd.MM.yyyy')}"></time>
 
     <label for="textColor">Your message text color:</label>
-    <div id="textColor" th:style="'color: ' + ${profile_dto.textColor}">TEXT COLOR</div>
+    <div id="textColor" th:style="'color: ' + ${user.textColor}"><b>TEXT COLOR</b></div>
 
     <a href="/home" class="button">Back</a>
     <!--      <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
