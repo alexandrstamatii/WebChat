@@ -83,7 +83,7 @@
     </style>
 </head>
 <body>
-<form name="profile" th:action="@{/edit_profile}" th:method="GET">
+<form name="profile" th:action="@{/profile/edit_profile}" th:method="GET">
     <h1>Sign Up</h1>
 
     <label for="name">Your Name:</label>
@@ -105,7 +105,8 @@
     <!--      <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
     <input type="submit" value="Edit Profile">
 </form>
-
-
+<form name="profile" th:action="@{/profile/edit_profile2/{username}(username=${user.getUsername()})}" th:method="GET">
+    <input type="submit" value="Edit Profile2">
+</form>
 </body>
 </html>

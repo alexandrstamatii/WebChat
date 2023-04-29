@@ -55,6 +55,7 @@ public class PersonService {
     public void updateUser(Person updatedUser, String username){
         Person currentUser = findUserByUsername(username);
 
+        //Blank and Empty String and null fields, will be replaced by current values
         if (checkIfNotBlankOrEmpty(updatedUser.getPassword())) currentUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
 
         if (checkIfNotBlankOrEmpty(updatedUser.getUsername())) findUserExistenceByUsername(updatedUser.getUsername());

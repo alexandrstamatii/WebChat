@@ -138,7 +138,7 @@
 </head>
 <body>
 
-<form id="update" name="update" th:action="@{/edit_profile}" th:method="POST" th:object="${user}">
+<form id="update" name="update" th:action="@{/profile/edit_profile}" th:method="POST" th:object="${user}">
     <h1>Update your profile</h1>
     <h4 style="color:green">Empty fields will be ignored</h4>
 
@@ -178,7 +178,7 @@
     <input type="submit" value="Update">
 </form>
 <br/>
-<form id="delete" name="delete" th:action="@{/delete}" th:method="POST">
+<form id="delete" name="delete" th:action="@{/profile/delete}" th:method="POST">
     <h3 style="color:red">Delete your account:</h3>
     <!--    <label for="password-check">Password:</label>-->
     <!--    <input type="password" id="password-check" name="password-check" th:value="${password-check}">-->
