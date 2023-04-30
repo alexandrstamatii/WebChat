@@ -56,14 +56,14 @@ public class PersonService {
         Person currentUser = findUserByUsername(username);
 
         //Blank and Empty String and null fields, will be replaced by current values
-        if (checkIfNotBlankOrEmpty(updatedUser.getPassword())) currentUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        if (!updatedUser.getPassword().isBlank()) currentUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
 
-        if (checkIfNotBlankOrEmpty(updatedUser.getUsername())) findUserExistenceByUsername(updatedUser.getUsername());
+        if (!updatedUser.getUsername().isBlank()) findUserExistenceByUsername(updatedUser.getUsername());
 
-        if (checkIfNotBlankOrEmpty(updatedUser.getEmail())) findUserExistenceByEmail(updatedUser.getEmail());
+        if (!updatedUser.getEmail().isBlank()) findUserExistenceByEmail(updatedUser.getEmail());
 
-        if (checkIfNotBlankOrEmpty(updatedUser.getName())) currentUser.setName(updatedUser.getName());
-        if (checkIfNotBlankOrEmpty(updatedUser.getTextColor())) currentUser.setTextColor(updatedUser.getTextColor());
+        if (!updatedUser.getName().isBlank()) currentUser.setName(updatedUser.getName());
+        if (!updatedUser.getTextColor().isBlank()) currentUser.setTextColor(updatedUser.getTextColor());
         if (updatedUser.getDob() != null) currentUser.setDob(updatedUser.getDob());
         if (updatedUser.getTheme() != null) currentUser.setTheme(updatedUser.getTheme());
         if (updatedUser.getCity() != null) currentUser.setCity(updatedUser.getCity());
@@ -71,10 +71,6 @@ public class PersonService {
 
         currentUser.setUpdatedAt(ZonedDateTime.now());
         personRepository.save(currentUser);
-    }
-
-    public boolean checkIfNotBlankOrEmpty(String string) {
-        return !string.isEmpty() && !string.isBlank();
     }
 
     @Transactional

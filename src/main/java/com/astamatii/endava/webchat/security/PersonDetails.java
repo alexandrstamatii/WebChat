@@ -1,7 +1,6 @@
 package com.astamatii.endava.webchat.security;
 
 import com.astamatii.endava.webchat.models.Person;
-import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +13,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class PersonDetails implements UserDetails {
     private final Person user;
+    private final Long nonExpiredPeriodMonths = 12L;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -35,14 +35,13 @@ public class PersonDetails implements UserDetails {
     @Override
     public boolean isAccountNonExpired() {
         ZonedDateTime lastLoginDate = user.getLastLoggedInAt();
-        long logoutPeriodMonths = 12L;
 
-        return lastLoginDate.plusMonths(logoutPeriodMonths).isAfter(ZonedDateTime.now());
+        return lastLoginDate.plusMonths(nonExpiredPeriodMonths).isAfter(ZonedDateTime.now());
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.isNonLocked();
+        return user.getLockExpiresAt().isBefore(ZonedDateTime.now());
     }
 
     @Override

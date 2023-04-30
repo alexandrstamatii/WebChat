@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -22,22 +21,19 @@ public class Person {
     private Long id;
 
     @NotNull
-    @NotBlank(message = "The name should not be blank")
-    @NotEmpty(message = "The name should not be empty")
+    @NotBlank(message = "The name should not be blank or empty")
     @Size(min = 3, max = 30, message = "The name must be between 3 and 30 letters in length")
     @Column(length = 30)
     private String name;
 
     @NotNull
-    @NotBlank(message = "The username should not be blank")
-    @NotEmpty(message = "The username should not be empty")
+    @NotBlank(message = "The name should not be blank or empty")
     @Size(min = 3, max = 15, message = "The username must be between 3 and 15 letters in length")
     @Column(unique = true, length = 15)
     private String username;
 
     @NotNull
-    @NotBlank(message = "email should not be blank")
-    @NotEmpty(message = "email should not be empty")
+    @NotBlank(message = "The name should not be blank (with whitespaces at both ends) or empty")
     @Email(message = "The email should look like this: your_email@email.com")
     @Column(unique = true, length = 30)
     private String email;
@@ -50,6 +46,7 @@ public class Person {
     private LocalDate dob;
 
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Hex value must be in the format #RRGGBB")
+    @NotBlank(message = "The name should not be blank (with whitespaces at both ends) or empty")
     @Column(columnDefinition = "varchar(7) default '#000000'")
     private String textColor;
     @Enumerated(EnumType.STRING)
@@ -79,9 +76,6 @@ public class Person {
 
     @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime lockExpiresAt;
-
-    @ColumnDefault("true")
-    private boolean nonLocked = true;
 
     @ColumnDefault("true")
     private boolean enabled = true;
@@ -114,8 +108,24 @@ public class Person {
         this.password = password;
     }
 
+    public void setName(String name) {
+        this.name = name.trim();
+    }
+
+    public void setUsername(String username) {
+        this.username = username.trim();
+    }
+
+    public void setEmail(String email) {
+        this.email = email.trim();
+    }
+
+    public void setTextColor(String textColor) {
+        this.textColor = textColor.trim();
+    }
+
     @PrePersist
-    public void setDefaultOnPersist(){
+    public void setDefaultOnPersist() {
 //        if (this.language == null) {
 //            this.language = new Language();
 //            this.language.setId(1L);
@@ -124,7 +134,6 @@ public class Person {
         ZonedDateTime currentTime = ZonedDateTime.now();
 
         this.enabled = true;
-        this.nonLocked = true;
         this.createdAt = currentTime;
         this.updatedAt = currentTime;
         this.lastLoggedInAt = currentTime;

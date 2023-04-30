@@ -134,6 +134,7 @@
           color: #fff;
           font-weight: bold;
         }
+
     </style>
 </head>
 <body>
@@ -170,10 +171,11 @@
     <input type="color" id="textColor" name="textColor" th:field="*{textColor}">
     <div th:if="${#fields.hasErrors('textColor')}" th:errors="*{textColor}" style="color:red"></div>
 
-<!--    <label for="password-check">Password:</label>-->
-<!--    <input type="password" id="password-check" name="password-check" th:value="${password-check}">-->
-<!--    <div th:if="${#fields.hasErrors('password-check')}" th:errors="${password-check}" style="color:red"></div>-->
-
+    <div th:object="${password-check}">
+        <label for="password-check">Password:</label>
+        <input type="password" id="password-check" name="password-check" th:field="*{value}">
+        <div th:if="${#fields.hasErrors('password-check')}" th:errors="${password-check}" style="color:red"></div>
+    </div>
     <a href="/profile" class="button">Back</a>
     <input type="submit" value="Update">
 </form>
@@ -217,6 +219,7 @@
 
   password.addEventListener("keyup", validatePassword);
   confirmPassword.addEventListener("keyup", validatePassword);
+
 
 
 

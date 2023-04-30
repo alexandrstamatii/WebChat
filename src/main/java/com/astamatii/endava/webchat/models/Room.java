@@ -74,7 +74,7 @@ public class Room {
     }
 
     @PreUpdate
-    public void setDefaultOnUpdate(){
+    public void setDefaultOnUpdate() {
         this.updatedAt = ZonedDateTime.now();
     }
 }

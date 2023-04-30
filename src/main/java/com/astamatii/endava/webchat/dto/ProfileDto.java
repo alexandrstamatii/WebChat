@@ -3,13 +3,10 @@ package com.astamatii.endava.webchat.dto;
 import com.astamatii.endava.webchat.models.City;
 import com.astamatii.endava.webchat.models.Language;
 import com.astamatii.endava.webchat.models.Theme;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 @Data
 public class ProfileDto {
