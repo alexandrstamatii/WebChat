@@ -63,15 +63,22 @@ public class ProfileController {
                 !profileDto.getTextColor().isBlank() && bindingResult.hasFieldErrors("testColor"))
             return "profile/edit_profile";
 
-        if (personService.passwordCheck(profileDto.getPasswordCheck(), currentUser)) {
+        if (!profileDto.getUsername().isBlank() && !profileDto.getUsername().equals(username) ||
+                !profileDto.getEmail().isBlank() && !profileDto.getEmail().equals(currentUser.getEmail()) ||
+                !profileDto.getPassword().isBlank())
 
-            personService.updateUser(profileDto, currentUser);
-            return "redirect:/profile";
-        }
+            if (personService.passwordCheck(profileDto.getPasswordCheck(), currentUser)) {
 
-        bindingResult.rejectValue("passwordCheck", "", "Password Check failed");
+                personService.updateUser(profileDto, currentUser);
+                return "redirect:/profile";
 
-        return "profile/edit_profile";
+            } else {
+                bindingResult.rejectValue("passwordCheck", "", "Password Check failed");
+                return "profile/edit_profile";
+            }
+
+        personService.updateUser(profileDto, currentUser);
+        return "redirect:/profile";
     }
 
     @PostMapping("/delete")
