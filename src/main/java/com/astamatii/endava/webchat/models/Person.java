@@ -20,29 +20,30 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @NotBlank(message = "The name should not be blank or empty")
     @Size(min = 3, max = 30, message = "The name must be between 3 and 30 letters in length")
+    @NotNull
     @Column(length = 30)
     private String name;
 
-    @NotNull
-    @NotBlank(message = "The name should not be blank or empty")
+    @NotBlank(message = "The username should not be blank or empty")
     @Size(min = 3, max = 15, message = "The username must be between 3 and 15 letters in length")
+    @NotNull
     @Column(unique = true, length = 15)
     private String username;
 
-    @NotNull
     @NotBlank(message = "The name should not be blank (with whitespaces at both ends) or empty")
+    @Size(max = 30, message = "The email must have less or 30 letters in length")
     @Email(message = "The email should look like this: your_email@email.com")
+    @NotNull
     @Column(unique = true, length = 30)
     private String email;
 
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
+            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.")
     @NotNull
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.")
     private String password;
 
-    //@DateTimeFormat(pattern = "dd.MM.yyyy") //throws DateTimeParseException ("Date format should be dd.MM.yyyy")
     private LocalDate dob;
 
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Hex value must be in the format #RRGGBB")
@@ -65,6 +66,15 @@ public class Person {
     @Column(columnDefinition = "int4 default 0")
     private int messageCount;
 
+    @NotNull
+    @ColumnDefault("true")
+    private boolean enabled = true;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(15) default 'ROLE_USER'")
+    private Role role;
+
     @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime createdAt;
 
@@ -76,13 +86,6 @@ public class Person {
 
     @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime lockExpiresAt;
-
-    @ColumnDefault("true")
-    private boolean enabled = true;
-
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(15) default 'ROLE_USER'")
-    private Role role;
 
     @ManyToMany(mappedBy = "bannedPeople", cascade = CascadeType.ALL)
     private List<Room> bannedRooms;
@@ -102,9 +105,9 @@ public class Person {
     private List<PrivateMessage> privateMessages;
 
     public Person(String name, String username, String email, String password) {
-        this.name = name;
-        this.username = username;
-        this.email = email;
+        this.name = name.trim();
+        this.username = username.trim();
+        this.email = email.trim();
         this.password = password;
     }
 

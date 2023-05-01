@@ -1,10 +1,12 @@
 package com.astamatii.endava.webchat.services;
 
+import com.astamatii.endava.webchat.dto.ProfileDto;
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.repositories.PersonRepository;
 import com.astamatii.endava.webchat.utils.exceptions.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,27 +20,26 @@ public class PersonService {
 
     @Transactional
     public Person findUserByUsername(String username) {
-        return personRepository.findByUsername(username).orElseThrow(UsernameNotFoundException::new);
+        return personRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-//    @Transactional
-//    public Person findUserByEmail(String email) {
-//        return personRepository.findByEmail(email).orElseThrow(EmailNotFoundException::new);
-//    }
-//
+    @Transactional
+    public Person findUserByEmail(String email) {
+        return personRepository.findByEmail(email).orElseThrow(() -> new EmailNotFoundException(email));
+    }
     @Transactional
     public Person findUserById(Long id) {
-        return personRepository.findById(id).orElseThrow(IdNotFoundException::new);
+        return personRepository.findById(id).orElseThrow(() -> new IdNotFoundException(id));
     }
 
     @Transactional
-    public void findUserExistenceByUsername(String username){
-        if (personRepository.findByUsername(username).isPresent()) throw new UsernameExistsException();
+    public void findUserExistenceByUsername(String username) {
+        if (personRepository.findByUsername(username).isPresent()) throw new UsernameExistsException(username);
     }
 
     @Transactional
-    public void findUserExistenceByEmail(String email){
-        if (personRepository.findByEmail(email).isPresent()) throw new EmailExistsException();
+    public void findUserExistenceByEmail(String email) {
+        if (personRepository.findByEmail(email).isPresent()) throw new EmailExistsException(email);
     }
 
     @Transactional
@@ -52,38 +53,42 @@ public class PersonService {
     }
 
     @Transactional
-    public void updateUser(Person updatedUser, String username){
-        Person currentUser = findUserByUsername(username);
+    public void updateUser(ProfileDto profileDto, Person currentUser) {
 
         //Blank and Empty String and null fields, will be replaced by current values
-        if (!updatedUser.getPassword().isBlank()) currentUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
 
-        if (!updatedUser.getUsername().isBlank()) findUserExistenceByUsername(updatedUser.getUsername());
+        if (!profileDto.getPassword().isBlank())
+            currentUser.setPassword(passwordEncoder.encode(profileDto.getPassword()));
 
-        if (!updatedUser.getEmail().isBlank()) findUserExistenceByEmail(updatedUser.getEmail());
+        if (!profileDto.getUsername().isBlank()) currentUser.setUsername(profileDto.getUsername());
 
-        if (!updatedUser.getName().isBlank()) currentUser.setName(updatedUser.getName());
-        if (!updatedUser.getTextColor().isBlank()) currentUser.setTextColor(updatedUser.getTextColor());
-        if (updatedUser.getDob() != null) currentUser.setDob(updatedUser.getDob());
-        if (updatedUser.getTheme() != null) currentUser.setTheme(updatedUser.getTheme());
-        if (updatedUser.getCity() != null) currentUser.setCity(updatedUser.getCity());
-        if (updatedUser.getLanguage() != null) currentUser.setLanguage(updatedUser.getLanguage());
+        if (!profileDto.getEmail().isBlank()) currentUser.setEmail(profileDto.getEmail());
+
+        if (!profileDto.getName().isBlank()) currentUser.setName(profileDto.getName());
+        if (!profileDto.getTextColor().isBlank()) currentUser.setTextColor(profileDto.getTextColor());
+        if (profileDto.getDob() != null) currentUser.setDob(profileDto.getDob());
+        if (profileDto.getTheme() != null) currentUser.setTheme(profileDto.getTheme());
+        if (profileDto.getCity() != null) currentUser.setCity(profileDto.getCity());
+        if (profileDto.getLanguage() != null) currentUser.setLanguage(profileDto.getLanguage());
 
         currentUser.setUpdatedAt(ZonedDateTime.now());
         personRepository.save(currentUser);
     }
 
-    @Transactional
-    public boolean passwordCheck(String enteredPassword, String username) {
-        String encodedEnteredPassword =  passwordEncoder.encode(enteredPassword);
-        return findUserByUsername(username).getPassword().equals(encodedEnteredPassword);
-    }
+//    @Transactional
+//    public boolean passwordCheck(String enteredPassword, String username) {
+//        String encodedEnteredPassword = passwordEncoder.encode(enteredPassword);
+//        return findUserByUsername(username).getPassword().equals(encodedEnteredPassword);
+//    }
 
     @Transactional
     public void deleteUser(String username) {
         personRepository.delete(findUserByUsername(username));
     }
 
+    public boolean passwordCheck(String enteredPassword, Person currentUser) {
+        return passwordEncoder.matches(enteredPassword, currentUser.getPassword());
+    }
 //    public Person mapProfileToPerson(ProfileDto profileDto) {
 //        Method[] methods = profileDto.getClass().getMethods();
 //

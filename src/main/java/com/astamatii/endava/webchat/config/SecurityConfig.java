@@ -19,7 +19,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig{
+public class SecurityConfig {
     private final PersonDetailsService personDetailsService;
     private final PersonAuthenticationSuccessHandler personAuthenticationSuccessHandler;
 
@@ -34,14 +34,14 @@ public class SecurityConfig{
                         .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                                .loginPage("/login")
+                                .loginProcessingUrl("/login")
 //                        .successHandler(personAuthenticationSuccessHandler)
-                        .defaultSuccessUrl("/home")
-                        .failureUrl("/login?error=true")
-                        .permitAll()
+                                .defaultSuccessUrl("/home")
+                                .failureUrl("/login?error=true")
+                                .permitAll()
                 )
-                .logout((logout) ->logout
+                .logout((logout) -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 //                        .logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
@@ -66,7 +66,7 @@ public class SecurityConfig{
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

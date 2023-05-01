@@ -5,6 +5,7 @@ import com.astamatii.endava.webchat.repositories.RoomRepository;
 import com.astamatii.endava.webchat.utils.exceptions.ChatRoomsNotFoundException;
 import com.astamatii.endava.webchat.utils.exceptions.RoomNameExistsException;
 import com.astamatii.endava.webchat.utils.exceptions.RoomNameNotFoundException;
+import com.astamatii.endava.webchat.utils.exceptions.UsernameExistsException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,30 +18,31 @@ import java.util.Optional;
 public class RoomService {
     private final RoomRepository roomRepository;
 
-    public List<Room> findAll() throws ChatRoomsNotFoundException {
+    public List<Room> findAll() {
         List<Room> list = roomRepository.findAll();
-        if(list.isEmpty())
+
+        if (list.isEmpty())
             throw new ChatRoomsNotFoundException();
+
         return list;
     }
 
     @Transactional
-    public Room findByRoomName(String roomName) throws RoomNameNotFoundException {
-        Optional<Room> roomOptional = roomRepository.findByRoomName(roomName);
-
-        return roomOptional.orElseThrow(RoomNameNotFoundException::new);
+    public Room findByRoomName(String roomName) {
+        return roomRepository.findByRoomName(roomName).orElseThrow(() -> new RoomNameNotFoundException(roomName));
     }
 
     @Transactional
-    public void createRoom(Room room) throws RoomNameExistsException {
-        if(verifyRoomNameExistence(room))
-            throw new RoomNameExistsException();
+    public void createRoom(Room room) {
+        findRoomExistenceByRoomName(room.getRoomName());
 
         roomRepository.save(room);
     }
 
-    private boolean verifyRoomNameExistence(Room room){
-        return roomRepository.findByRoomName(room.getRoomName()).isPresent();
+    @Transactional
+    public void findRoomExistenceByRoomName(String roomName) {
+        if (roomRepository.findByRoomName(roomName).isPresent()) throw new RoomNameExistsException(roomName);
     }
+
 
 }

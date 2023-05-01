@@ -1,5 +1,6 @@
 package com.astamatii.endava.webchat.controllers;
 
+import com.astamatii.endava.webchat.dto.ProfileDto;
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.security.PersonDetails;
 import com.astamatii.endava.webchat.services.PersonService;
@@ -12,14 +13,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/profile")
 public class ProfileController {
     private final PersonService personService;
-//    private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 //    @ModelAttribute("profile_dto")
 //    public ProfileDto profileDto() throws UsernameNotFoundException {
@@ -35,86 +40,53 @@ public class ProfileController {
         return "profile/profile";
     }
 
-    public class PasswordCheck {
-        private String value;
-
-        public PasswordCheck() {
-            value = "";
-        }
-
-        public String getValue() { return value; }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-    };
-
     @GetMapping("/edit_profile")
     public String editProfilePage(Model model) {
         String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        model.addAttribute("user", personService.findUserByUsername(username));
-        model.addAttribute("password-check", new PasswordCheck());
+        ProfileDto user = modelMapper.map(personService.findUserByUsername(username), ProfileDto.class);
+        model.addAttribute("user", user);
 
         return "profile/edit_profile";
     }
 
     @PostMapping("/edit_profile")
-    public String updateProfile(@ModelAttribute("user") @Valid Person updatedUser,
-                                @ModelAttribute("password-check") String enteredPassword,
+    public String updateProfile(@ModelAttribute("user") @Valid ProfileDto profileDto,
                                 BindingResult bindingResult) {
         String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         Person currentUser = personService.findUserByUsername(username);
 
-        System.out.println("HHHHHHHEEEEEEEEEERRRRRRRREEEEEEEEEEEE!!!!!!!!!!!!!!>>>>>>>>>>>>>>>>>  " + enteredPassword);
+        //Handling Validation. In order to update profile ignoring empty fields.
+        if (!profileDto.getUsername().isBlank() && bindingResult.hasFieldErrors("username") && !profileDto.getUsername().equals(username) ||
+                !profileDto.getEmail().isBlank() && bindingResult.hasFieldErrors("email") && !profileDto.getEmail().equals(currentUser.getEmail()) ||
+                !profileDto.getName().isBlank() && bindingResult.hasFieldErrors("name") ||
+                !profileDto.getPassword().isBlank() && bindingResult.hasFieldErrors("password") ||
+                !profileDto.getTextColor().isBlank() && bindingResult.hasFieldErrors("testColor"))
+            return "profile/edit_profile";
 
-        //Handling Validation. In order to make possible profile updating with ignoring empty fields.
-        if (personService.checkIfNotBlankOrEmpty(updatedUser.getName()))
-            if (bindingResult.hasFieldErrors("name")) return "profile/edit_profile";
-            else if (personService.checkIfNotBlankOrEmpty(updatedUser.getUsername())) {
-                try {
-                    if (!updatedUser.getUsername().equals(currentUser.getUsername()))
-                        personService.findUserExistenceByUsername(updatedUser.getUsername());
-                } catch (UsernameExistsException e) {
-                    bindingResult.rejectValue("username", "", e.getMessage());
-                }
+        if (personService.passwordCheck(profileDto.getPasswordCheck(), currentUser)) {
 
-                if (bindingResult.hasFieldErrors("username")) return "profile/edit_profile";
-            } else if (personService.checkIfNotBlankOrEmpty(updatedUser.getEmail())) {
-                try {
-                    if (!updatedUser.getEmail().equals(currentUser.getEmail()))
-                        personService.findUserExistenceByEmail(updatedUser.getEmail());
-                } catch (EmailExistsException e) {
-                    bindingResult.rejectValue("email", "", e.getMessage());
-                }
-
-                if (bindingResult.hasFieldErrors("email")) return "profile/edit_profile";
-            } else if (personService.checkIfNotBlankOrEmpty(updatedUser.getPassword()))
-                if (bindingResult.hasFieldErrors("password")) return "profile/edit_profile";
-
-        if (true/*personService.passwordCheck(enteredPassword, username)*/) {
-
-            personService.updateUser(updatedUser, username);
+            personService.updateUser(profileDto, currentUser);
             return "redirect:/profile";
         }
-//        bindingResult.rejectValue("password-check", "", "You`ve entered a wrong password");
+
+        bindingResult.rejectValue("passwordCheck", "", "Password Check failed");
 
         return "profile/edit_profile";
     }
 
     @PostMapping("/delete")
-    public String deleteProfile(/*@ModelAttribute("password_check") String enteredPassword,
-                                BindingResult bindingResult*/) {
+    public String deleteProfile(@ModelAttribute("user") ProfileDto profileDto,
+                                BindingResult bindingResult) {
 
         String username = ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        Person currentUser = personService.findUserByUsername(username);
 
-        if (true/*personService.passwordCheck(enteredPassword, username)*/) {
+        if (personService.passwordCheck(profileDto.getPasswordCheck(), currentUser)) {
 
             personService.deleteUser(username);
             return "redirect:/logout";
         }
-
-//        bindingResult.rejectValue("password-check", "", "You`ve entered a wrong password");
-
+        bindingResult.rejectValue("passwordCheck", "", "Password Check Failed");
         return "profile/edit_profile";
     }
 
