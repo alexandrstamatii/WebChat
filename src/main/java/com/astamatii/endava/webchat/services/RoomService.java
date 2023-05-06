@@ -5,13 +5,11 @@ import com.astamatii.endava.webchat.repositories.RoomRepository;
 import com.astamatii.endava.webchat.utils.exceptions.ChatRoomsNotFoundException;
 import com.astamatii.endava.webchat.utils.exceptions.RoomNameExistsException;
 import com.astamatii.endava.webchat.utils.exceptions.RoomNameNotFoundException;
-import com.astamatii.endava.webchat.utils.exceptions.UsernameExistsException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +41,4 @@ public class RoomService {
     public void findRoomExistenceByRoomName(String roomName) {
         if (roomRepository.findByRoomName(roomName).isPresent()) throw new RoomNameExistsException(roomName);
     }
-
-
 }

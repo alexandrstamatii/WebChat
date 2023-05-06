@@ -28,7 +28,7 @@
 			background-color: #333;
 			padding: 10px 30px;
 			border-radius: 10px;
-			margin-top: 10px;
+			margin-top: 0px;
 		}
 		.popup {
 		    position: absolute;
@@ -68,7 +68,6 @@
 			color: #fff;
 			font-size: 16px;
 			line-height: 1.5;
-			cursor:pointer;
 		}
 		 input[type="color"] {
 			display: block;
@@ -80,7 +79,7 @@
 			cursor:pointer;
 		}
 
-		input[type="submit"], .cancel , #update-button {
+		input[type="submit"], .cancel , #update-button, #back, #delete-button {
 			display: inline-block;
 			padding: 10px 20px;
 			background-color: #fff;
@@ -95,42 +94,41 @@
 			cursor:pointer;
 		}
 
+        #back, .cancel  {
+            background-color: #111;
+			color: #bcc;
+        }
+
 		#delete-button {
-		    display: inline-block;
 		    position: relative;
 		    width: 200px;
-			padding: 10px 20px;
-			background-color: #fff;
-			color: #222;
-			font-weight: bold;
-			border-radius: 20px;
-			text-decoration: none;
 			margin: 5px 5px;
-			font-size: 16px;
-			line-height: 1.5;
-			transition: background-color 0.3s ease;
-			cursor:pointer;
 		}
 
-		.button {
-          display: inline-block;
-          padding: 10px 20px;
-          font-size: 16px;
-          font-weight: bold;
-          text-align: center;
-          text-decoration: none;
-          color: #bcc;
-          background-color: #111;
-          border: none;
-          border-radius: 15px;
-          cursor: pointer;
+		input[type="submit"]:hover, .cancel:hover , #update-button:hover, #back:hover, #delete-button:hover {
+            background-color: #444;
+            color: #fff;
+            font-weight: bold;
         }
 
-        .button:hover, input[type="button"]:hover, input[type="submit"]:hover {
-          background-color: #444;
-          color: #fff;
-          font-weight: bold;
+        #delete-button:hover, #delete-submit:hover {
+            background-color: red;
         }
+
+        .error {
+            display: inline-block;
+            padding: 5px 10px;
+            min-width: 350px;
+			background-color: red;
+			color: white;
+			font-weight: bold;
+			border-radius: 15px;
+			text-decoration: none;
+			font-size: 18px;
+        }
+
+
+
 
 
 
@@ -147,20 +145,24 @@
     <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></div>
     <br/>
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" th:field="*{username}">
+    <input type="text" id="username" name="username" th:field="*{username}"
+           onchange="changeInput()">
     <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red"></div>
     <br/>
     <label for="email">Your Email:</label>
-    <input type="text" id="email" name="email" th:field="*{email}">
+    <input type="text" id="email" name="email" th:field="*{email}"
+           onchange="changeInput()">
     <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></div>
     <br/>
     <label for="password">Password:</label>
-    <input type="password" id="password" name="password">
+    <input type="password" id="password" name="password"
+           onchange="changeInput()">
     <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></div>
+    <div class="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
     <br/>
     <label for="confirm-password">Confirm Password:</label>
     <input type="password" id="confirm-password" name="confirmPassword">
-    <div id="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
+    <div class="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
     <br/>
     <label for="dob">Date of Birth:</label>
     <input type="date" id="dob" name="dob" th:field="*{dob}" pattern="\d{2}/\d{2}/\d{4}">
@@ -170,11 +172,10 @@
     <input type="color" id="textColor" name="textColor" th:field="*{textColor}">
     <div th:if="${#fields.hasErrors('textColor')}" th:errors="*{textColor}" style="color:red"></div>
     <br/>
-    <a href="/profile" class="button">Back</a>
+    <input type="button" id="back" value="Back" onclick="window.location.href='/profile'">
     <input type="button" class="open-popup" id="update-button" data-popup="update-password-check" value="Update">
     <br/>
     <br/>
-    <!--    <div th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}" style="color:red"></div>-->
     <div class="overlay" id="update-password-check">
         <div class="popup">
             <label for="password-check">Type current password:</label>
@@ -187,7 +188,7 @@
 </form>
 <br/>
 <form th:object="${user}" style="margin-top:20px">
-    <div th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}" style="color:red"></div>
+    <div class="error" th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}">Error</div>
 </form>
 <br/>
 <form id="delete" name="delete" th:action="@{/profile/delete}" th:method="POST" th:object="${user}">
@@ -202,20 +203,30 @@
             <input type="password" id="password-check2" name="password-check" th:field="*{passwordCheck}">
             <br/>
             <input type="button" class="cancel" value="Cancel">
-            <input type="submit" value="Delete Account">
+            <input type="submit" id="delete-submit" value="Delete Account">
         </div>
     </div>
 </form>
 
 <script>
-	var popupsToggle = document.querySelectorAll('.open-popup'),
-		popupClose = document.querySelectorAll('.cancel');
+    var popupDelete = document.querySelector('#delete-button'),
+        popupUpdate = document.querySelector('#update-button'),
+        divDelete = document.getElementById('delete-password-check'),
+        divUpdate = document.querySelector('#update-password-check'),
+        formUpdate = document.querySelector('#update'),
+		popupClose = document.querySelectorAll('.cancel'),
+        changedInput = false;
 
-    popupsToggle.forEach(function(item) {
-        item.addEventListener('click', function() {
-            var popupName = item.getAttribute('data-popup');
-            document.getElementById(popupName).style.display = "inline-block";
-        })
+    function changeInput() {
+        changedInput = true;
+    }
+
+    popupDelete.addEventListener('click', function () { divDelete.style.display = "inline-block"; });
+
+    popupUpdate.addEventListener('click', function () {
+        if (changedInput)
+            divUpdate.style.display = "inline-block";
+        else formUpdate.submit();
     });
 
     popupClose.forEach(function(item) {
@@ -225,34 +236,34 @@
         })
     });
 
-	window.onclick = function(e) {
-		if (e.target.classList.contains('overlay')) {
-			e.target.style.display = "none";
-		}
-	}
+    window.onclick = function(e) {
+        if (e.target.classList.contains('overlay')) {
+            e.target.style.display = "none";
+        }
+    }
+
+
 
 </script>
 
 <script>
-  var password = document.getElementById("password");
-  var confirmPassword = document.getElementById("confirm-password");
-  var passwordMismatch = document.getElementById("password-mismatch");
-  var submitButton = document.querySelector("input[type='submit']");
+  var password = document.getElementById("password"),
+      confirmPassword = document.getElementById("confirm-password"),
+      passwordMismatch = document.querySelectorAll(".password-mismatch"),
+      submitButton = document.querySelector("input[type='submit']");
 
   function validatePassword() {
     if (password.value != confirmPassword.value) {
-      passwordMismatch.style.display = "block";
+      passwordMismatch.forEach(item => item.style.display = "block");
       submitButton.disabled = true;
     } else {
-      passwordMismatch.style.display = "none";
+      passwordMismatch.forEach(item => item.style.display = "none");
       submitButton.disabled = false;
     }
   }
 
   password.addEventListener("keyup", validatePassword);
   confirmPassword.addEventListener("keyup", validatePassword);
-
-
 
 </script>
 

@@ -23,25 +23,30 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String registerPage(@ModelAttribute("person") Person person) {
+    public String registerPage(@ModelAttribute("user") Person person) {
         return "auth/register";
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult) {
+    public String registerUser(@ModelAttribute("user") @Valid Person person, BindingResult bindingResult) {
 
         try {
-            personService.registerUser(person);
+            personService.findUserExistenceByEmail(person.getUsername());
         } catch (UsernameExistsException e) {
-            bindingResult.rejectValue("username", "",e.getMessage());
+            bindingResult.rejectValue("username", "", e.getMessage());
+        }
+
+        try {
+            personService.findUserExistenceByEmail(person.getEmail());
         } catch (EmailExistsException e) {
-            bindingResult.rejectValue("email", "",e.getMessage());
+            bindingResult.rejectValue("email", "", e.getMessage());
         }
 
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
 
+        personService.registerUser(person);
         return "redirect:/login";
     }
 

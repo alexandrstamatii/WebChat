@@ -13,7 +13,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class PersonDetails implements UserDetails {
     private final Person user;
-    private final Long nonExpiredPeriodMonths = 12L;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -34,14 +33,19 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        ZonedDateTime lastLoginDate = user.getLastLoggedInAt();
 
-        return lastLoginDate.plusMonths(nonExpiredPeriodMonths).isAfter(ZonedDateTime.now());
+        return user
+                .getLastLoggedInAt()
+                .plusDays(user.getNonExpiredPeriodDays())
+                .isAfter(ZonedDateTime.now());
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.getLockExpiresAt().isBefore(ZonedDateTime.now());
+
+        return user
+                .getLockExpiresAt()
+                .isBefore(ZonedDateTime.now());
     }
 
     @Override

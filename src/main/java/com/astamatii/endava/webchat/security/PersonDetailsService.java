@@ -4,6 +4,9 @@ import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.repositories.PersonRepository;
 import com.astamatii.endava.webchat.utils.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -30,5 +33,15 @@ public class PersonDetailsService implements UserDetailsService {
         personRepository.save(user);
 
         return new PersonDetails(user);
+    }
+
+    public String getCurrentUsername() {
+        return ((PersonDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+    }
+
+    public void updateUserDetails(Person user) {
+        UserDetails updatedUserDetails = new PersonDetails(user);
+        Authentication updatedAuthentication = new UsernamePasswordAuthenticationToken(updatedUserDetails, updatedUserDetails.getPassword(), updatedUserDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(updatedAuthentication);
     }
 }

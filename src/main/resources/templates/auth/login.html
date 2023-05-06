@@ -39,7 +39,7 @@
 			display: inline-block;
 			padding: 10px 20px;
 			background-color: #fff;
-			color: #222;
+		    color: #222;
 			font-weight: bold;
 			border-radius: 20px;
 			text-decoration: none;
@@ -49,26 +49,20 @@
 			font-size: 16px;
 			line-height: 1.5;
 			transition: background-color 0.3s ease;
+			cursor:pointer;
 		}
-		.button {
-          display: inline-block;
-          padding: 10px 20px;
-          font-size: 16px;
-          font-weight: bold;
-          text-align: center;
-          text-decoration: none;
-          color: #bcc;
-          background-color: #111;
-          border: none;
-          border-radius: 15px;
-          cursor: pointer;
+
+		input[type="button"] {
+			background-color: #111;
+			color: #bcc;
         }
 
-        .button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+        input[type="button"]:hover, input[type="submit"]:hover {
           background-color: #444;
           color: #fff;
           font-weight: bold;
         }
+
 
     </style>
 </head>
@@ -80,22 +74,9 @@
     <label for="password">Your Password:</label>
     <input type="password" id="password" name="password" required>
     <div th:if="${param.error}" style="color:red">Incorrect username, email or password</div>
-    <a href="/register" class="button">Sign Up</a>
-    <!--  <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
+    <input type="button" value="Sign Up" onclick="window.location.href='/register'">
     <input type="submit" value="Login">
 </form>
-
-<!--<form action="#" th:action="@{/login}" th:object="${loginForm}" method="POST">-->
-<!--  <label for="usernameEmail">Username/Email:</label>-->
-<!--  <input type="text" id="usernameEmail" th:field="*{usernameEmail}" required>-->
-<!--  <div th:if="${#fields.hasErrors('usernameEmail')}" th:errors="*{usernameEmail}" class="error-message"></div>-->
-
-<!--  <label for="password">Password:</label>-->
-<!--  <input type="password" id="password" th:field="*{password}" required>-->
-<!--  <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>-->
-<!--  <input type="button" value="Sign Up" onclick="window.location.href='/register'">-->
-<!--  <input type="submit" value="Login">-->
-<!--</form>-->
 
 </body>
 </html>

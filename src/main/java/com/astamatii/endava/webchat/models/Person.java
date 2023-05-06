@@ -48,10 +48,10 @@ public class Person {
 
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Hex value must be in the format #RRGGBB")
     @NotBlank(message = "The name should not be blank (with whitespaces at both ends) or empty")
-    @Column(columnDefinition = "varchar(7) default '#000000'")
+    @Column(columnDefinition = "varchar(7) DEFAULT '#000000'")
     private String textColor;
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(10) default 'COLORED'")
+    @Column(columnDefinition = "varchar(10) DEFAULT 'COLORED'")
     private Theme theme;
 
     @ManyToOne
@@ -60,19 +60,20 @@ public class Person {
     @ManyToOne
     private Language language;
 
-    @Column(columnDefinition = "int4 default 0")
+    @Column(columnDefinition = "int4 DEFAULT 0")
     private int bannedCount;
 
-    @Column(columnDefinition = "int4 default 0")
+    @Column(columnDefinition = "int4 DEFAULT 0")
     private int messageCount;
 
-    @NotNull
-    @ColumnDefault("true")
-    private boolean enabled = true;
+    @Column(columnDefinition = "bool NOT NULL DEFAULT true")
+    private boolean enabled;
 
-    @NotNull
+    @Column(columnDefinition = "int2 NOT NULL DEFAULT 365")
+    private short nonExpiredPeriodDays;
+
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(15) default 'ROLE_USER'")
+    @Column(columnDefinition = "varchar(15) NOT NULL DEFAULT 'ROLE_USER'")
     private Role role;
 
     @ColumnDefault("CURRENT_TIMESTAMP(6)")
@@ -81,10 +82,10 @@ public class Person {
     @ColumnDefault("CURRENT_TIMESTAMP(6)")
     private ZonedDateTime updatedAt;
 
-    @ColumnDefault("CURRENT_TIMESTAMP(6)")
+    @Column(columnDefinition = "timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)")
     private ZonedDateTime lastLoggedInAt;
 
-    @ColumnDefault("CURRENT_TIMESTAMP(6)")
+    @Column(columnDefinition = "timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)")
     private ZonedDateTime lockExpiresAt;
 
     @ManyToMany(mappedBy = "bannedPeople", cascade = CascadeType.ALL)
@@ -142,6 +143,7 @@ public class Person {
         this.lastLoggedInAt = currentTime;
         this.lockExpiresAt = currentTime;
         this.role = Role.ROLE_USER;
+        this.nonExpiredPeriodDays = 365;
     }
 
     @PreUpdate
