@@ -58,7 +58,6 @@ public class PersonService {
     public void updateUser(ProfileDto profileDto) {
 
         Person currentUser = getCurrentUser();
-        System.out.println("HERE IS THE ID!!!!!!!!! >>>>>>>>>>> Id = " + currentUser.getId());
 
         //Blank and Empty String and null fields, will be replaced by current values
 

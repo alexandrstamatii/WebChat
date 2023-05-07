@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,11 +34,11 @@ public class ProfileController {
     }
 
     @GetMapping("/edit_profile")
-    public String editProfilePage(Model model)  {
+    public String editProfilePage(Model model) {
         ProfileDto user = modelMapper.map(personService.getCurrentUser(), ProfileDto.class);
         model.addAttribute("user", user);
 
-        //This list will rule which error in edit_profile to show, which to hide in the view (because by default BindingResult holds everything)
+        //This list will rule which error field in edit_profile to show, if exist (because by default BindingResult holds everything)
         List<Boolean> errorFlags = Arrays.asList(false, false, false, false, false, false);
         model.addAttribute("errorFlags", errorFlags);
 
@@ -51,15 +52,15 @@ public class ProfileController {
 
         List<Boolean> errorFlags = new ArrayList<>(6);
 
-        //Handling Validation. In order to update profile ignoring empty fields.
-        //errorFlags must add strictly in the order shown bellow:
+        // Handling Validation. In order to update profile ignoring empty fields
+        // and showing only not ignored error fields. Add errorFlags strictly in the order below:
         errorFlags.add(!profileDto.getName().isBlank() && bindingResult.hasFieldErrors("name"));
         errorFlags.add(!profileDto.getUsername().isBlank() && bindingResult.hasFieldErrors("username")
                 && !profileDto.getUsername().equals(currentUser.getUsername()));
         errorFlags.add(!profileDto.getEmail().isBlank() && bindingResult.hasFieldErrors("email")
                 && !profileDto.getEmail().equals(currentUser.getEmail()));
         errorFlags.add(!profileDto.getPassword().isBlank() && bindingResult.hasFieldErrors("password"));
-        errorFlags.add(!bindingResult.hasFieldErrors("dob"));
+        errorFlags.add(bindingResult.hasFieldErrors("dob"));
         errorFlags.add(!profileDto.getTextColor().isBlank() && bindingResult.hasFieldErrors("testColor"));
 
         model.addAttribute("errorFlags", errorFlags);
@@ -67,25 +68,22 @@ public class ProfileController {
         if (errorFlags.stream().anyMatch(flag -> flag))
             return "profile/edit_profile";
 
-        if (bindingResult.hasErrors())
-            return "profile/edit_profile";
-
         //Password check. This will work only when username, email or password were changed and aren`t blank fields.
-        if (!profileDto.getUsername().isBlank() && !profileDto.getUsername().equals(currentUser.getUsername())
-                || !profileDto.getEmail().isBlank() && !profileDto.getEmail().equals(currentUser.getEmail())
-                || !profileDto.getPassword().isBlank())
+        if (!profileDto.getUsername().isBlank() && !currentUser.getUsername().equals(profileDto.getUsername())
+                || !profileDto.getEmail().isBlank() && !currentUser.getEmail().equals(profileDto.getEmail())
+                || !profileDto.getPassword().isBlank()) {
+
             if (personService.passwordCheck(profileDto.getPasswordCheck())) {
                 personService.updateUser(profileDto);
                 return "redirect:/profile";
-
             } else {
                 bindingResult.rejectValue("passwordCheck", "", "Password Check failed");
                 return "profile/edit_profile";
             }
+        }
 
         //When username, email or password are blank or unchanged, the update process will begin without password check.
         personService.updateUser(profileDto);
-
         return "redirect:/profile";
     }
 

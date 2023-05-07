@@ -206,24 +206,27 @@
         divDelete = document.getElementById('delete-password-check'),
         divUpdate = document.querySelector('#update-password-check'),
         formUpdate = document.querySelector('#update'),
+        formDelete = document.querySelector('#delete'),
         popupClose = document.querySelectorAll('.cancel'),
         credentials = document.querySelectorAll('.credentials'),
+        passwordCheck = document.getElementById('password-check'),
+        passwordCheck2 = document.getElementById('password-check2'),
         changedInput = false;
 
-    credentials.forEach((item) => item.addEventListener("input", (event) => changedInput = true));
+    credentials.forEach(item => item.addEventListener("input", (event) => changedInput = true));
 
     formUpdate.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        popupUpdate.click();
-      }
+        if (event.key === "Enter") {
+            event.preventDefault();
+            popupUpdate.click();
+        }
     });
 
-    popupDelete.addEventListener('click', function () { divDelete.style.display = "inline-block"; });
-
     popupUpdate.addEventListener('click', function () {
-        if (changedInput)
+        if (changedInput) {
             divUpdate.style.display = "inline-block";
+            passwordCheck.select();
+        }
         else {
             document.querySelector('#username').value = '';
             document.querySelector('#email').value = '';
@@ -232,18 +235,41 @@
         }
     });
 
+    formDelete.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+      }
+    });
+
+    popupDelete.addEventListener('click', function () {
+        divDelete.style.display = "inline-block";
+        passwordCheck2.select();
+    });
+
     popupClose.forEach(function(item) {
         item.addEventListener ('click', function() {
             var popup = item.closest('.overlay');
             popup.style.display = "none";
-        })
+        });
     });
 
     window.onclick = function(e) {
         if (e.target.classList.contains('overlay')) {
             e.target.style.display = "none";
         }
-    }
+    };
+    document.onkeydown = function(evt) {
+        evt = evt || window.event;
+        var isEscape = false;
+        if ("key" in evt) {
+            isEscape = (evt.key === "Escape" || evt.key === "Esc");
+        } else {
+            isEscape = (evt.keyCode === 27);
+        }
+        if (isEscape) {
+            popupClose.forEach(item => item.click());
+        }
+    };
 </script>
 
 <script>
