@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/profile")
@@ -24,39 +28,53 @@ public class ProfileController {
     @GetMapping
     public String profilePage(Model model) {
         model.addAttribute("user", personService.getCurrentUser());
+
         return "profile/profile";
     }
 
     @GetMapping("/edit_profile")
-    public String editProfilePage(Model model) {
+    public String editProfilePage(Model model)  {
         ProfileDto user = modelMapper.map(personService.getCurrentUser(), ProfileDto.class);
         model.addAttribute("user", user);
+
+        //This list will rule which error in edit_profile to show, which to hide in the view (because by default BindingResult holds everything)
+        List<Boolean> errorFlags = Arrays.asList(false, false, false, false, false, false);
+        model.addAttribute("errorFlags", errorFlags);
 
         return "profile/edit_profile";
     }
 
     @PostMapping("/edit_profile")
     public String updateProfile(@ModelAttribute("user") @Valid ProfileDto profileDto,
-                                BindingResult bindingResult) {
+                                BindingResult bindingResult, Model model) {
         Person currentUser = personService.getCurrentUser();
 
+        List<Boolean> errorFlags = new ArrayList<>(6);
+
         //Handling Validation. In order to update profile ignoring empty fields.
-        if (!profileDto.getUsername().isBlank() && bindingResult.hasFieldErrors("username")
-                    && !profileDto.getUsername().equals(currentUser.getUsername())
-                || !profileDto.getEmail().isBlank() && bindingResult.hasFieldErrors("email")
-                    && !profileDto.getEmail().equals(currentUser.getEmail())
-                || !profileDto.getName().isBlank() && bindingResult.hasFieldErrors("name")
-                || !profileDto.getPassword().isBlank() && bindingResult.hasFieldErrors("password")
-                || !profileDto.getTextColor().isBlank() && bindingResult.hasFieldErrors("testColor"))
+        //errorFlags must add strictly in the order shown bellow:
+        errorFlags.add(!profileDto.getName().isBlank() && bindingResult.hasFieldErrors("name"));
+        errorFlags.add(!profileDto.getUsername().isBlank() && bindingResult.hasFieldErrors("username")
+                && !profileDto.getUsername().equals(currentUser.getUsername()));
+        errorFlags.add(!profileDto.getEmail().isBlank() && bindingResult.hasFieldErrors("email")
+                && !profileDto.getEmail().equals(currentUser.getEmail()));
+        errorFlags.add(!profileDto.getPassword().isBlank() && bindingResult.hasFieldErrors("password"));
+        errorFlags.add(!bindingResult.hasFieldErrors("dob"));
+        errorFlags.add(!profileDto.getTextColor().isBlank() && bindingResult.hasFieldErrors("testColor"));
+
+        model.addAttribute("errorFlags", errorFlags);
+
+        if (errorFlags.stream().anyMatch(flag -> flag))
+            return "profile/edit_profile";
+
+        if (bindingResult.hasErrors())
             return "profile/edit_profile";
 
         //Password check. This will work only when username, email or password were changed and aren`t blank fields.
         if (!profileDto.getUsername().isBlank() && !profileDto.getUsername().equals(currentUser.getUsername())
                 || !profileDto.getEmail().isBlank() && !profileDto.getEmail().equals(currentUser.getEmail())
                 || !profileDto.getPassword().isBlank())
-
             if (personService.passwordCheck(profileDto.getPasswordCheck())) {
-
                 personService.updateUser(profileDto);
                 return "redirect:/profile";
 
@@ -67,6 +85,7 @@ public class ProfileController {
 
         //When username, email or password are blank or unchanged, the update process will begin without password check.
         personService.updateUser(profileDto);
+
         return "redirect:/profile";
     }
 
