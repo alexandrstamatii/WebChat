@@ -56,9 +56,8 @@ public class PersonService {
     }
 
     @Transactional
-    public void updateUser(Person updatedUser) {
-        personRepository.save(updatedUser);
-        personDetailsService.updateUserDetails(updatedUser);
+    public Person updateUser(Person updatedUser) {
+        return personRepository.save(updatedUser);
     }
 
     @Transactional

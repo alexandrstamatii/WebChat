@@ -3,6 +3,7 @@ package com.astamatii.endava.webchat.controllers;
 import com.astamatii.endava.webchat.dto.ProfileDto;
 import com.astamatii.endava.webchat.dto.helpers.ProfileDtoNotBlankNotNullFlags;
 import com.astamatii.endava.webchat.models.Person;
+import com.astamatii.endava.webchat.security.PersonDetailsService;
 import com.astamatii.endava.webchat.services.PersonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/profile")
 public class ProfileController {
     private final PersonService personService;
+    private final PersonDetailsService personDetailsService;
     private final ModelMapper modelMapper;
 
     @GetMapping
@@ -59,7 +61,7 @@ public class ProfileController {
         if (profileDtoNotBlankNotNullFlags.isAnyChangedCredentials()) {
             if (personService.passwordCheck(profileDto.getPasswordCheck())) {
                 Person updatedUser = personService.prepareUpdatedUser(profileDto, personService.profileDtoNotBlankNotNullFlags(profileDto));
-                personService.updateUser(updatedUser);
+                personDetailsService.updateUserDetails(personService.updateUser(updatedUser));
                 return "redirect:/profile";
             } else {
                 bindingResult.rejectValue("passwordCheck", "", "Password Check failed");
@@ -69,7 +71,7 @@ public class ProfileController {
 
         //When username, email or password are blank or unchanged, the update process will begin without password check.
         Person updatedUser = personService.prepareUpdatedUser(profileDto, personService.profileDtoNotBlankNotNullFlags(profileDto));
-        personService.updateUser(updatedUser);
+       personService.updateUser(updatedUser);
         return "redirect:/profile";
     }
 

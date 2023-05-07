@@ -19,7 +19,6 @@
             background-color: #333;
             padding: 10px 30px;
             border-radius: 10px;
-            margin-top: 30px;
         }
         #delete{
             display: inline-block;
@@ -120,11 +119,13 @@
             border-radius: 15px;
             text-decoration: none;
             font-size: 18px;
+            margin-bottom: 0px;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-<form th:object="${user}" style="margin-top:20px">
+<form th:object="${user}" >
     <div class="error" th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}">Error</div>
 </form>
 <br/>
@@ -213,6 +214,7 @@
         passwordError = /*[[${errorFlags.password}]]*/ false,
         changedInput = false;
 
+
     if (emailError || usernameError || passwordError) {
             changedInput = true;
     }
@@ -225,7 +227,7 @@
                 event.preventDefault();
                 popupUpdate.click();
             }
-            if (backButton.matches(':focus') {
+            if (backButton.matches(':focus')) {
                 event.preventDefault();
                 backButton.click();
             }
