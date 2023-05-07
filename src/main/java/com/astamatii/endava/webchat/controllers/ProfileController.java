@@ -1,6 +1,7 @@
 package com.astamatii.endava.webchat.controllers;
 
 import com.astamatii.endava.webchat.dto.ProfileDto;
+import com.astamatii.endava.webchat.dto.helpers.ProfileDtoNotBlankNotNullFlags;
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.services.PersonService;
 import jakarta.validation.Valid;
@@ -13,11 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,9 +34,8 @@ public class ProfileController {
         ProfileDto user = modelMapper.map(personService.getCurrentUser(), ProfileDto.class);
         model.addAttribute("user", user);
 
-        //This list will rule which error field in edit_profile to show, if exist (because by default BindingResult holds everything)
-        List<Boolean> errorFlags = Arrays.asList(false, false, false, false, false, false);
-        model.addAttribute("errorFlags", errorFlags);
+        //This object will rule which error field in edit_profile to show, if exist (because by default BindingResult holds everything)
+        model.addAttribute("errorFlags", new ProfileDtoNotBlankNotNullFlags());
 
         return "profile/edit_profile";
     }
@@ -48,33 +43,23 @@ public class ProfileController {
     @PostMapping("/edit_profile")
     public String updateProfile(@ModelAttribute("user") @Valid ProfileDto profileDto,
                                 BindingResult bindingResult, Model model) {
-        Person currentUser = personService.getCurrentUser();
 
-        List<Boolean> errorFlags = new ArrayList<>(6);
+        // Profile flags are without errors. True - means fields were changed, False - fields will be ignored.
+        ProfileDtoNotBlankNotNullFlags profileDtoNotBlankNotNullFlags = personService.profileDtoNotBlankNotNullFlags(profileDto);
 
         // Handling Validation. In order to update profile ignoring empty fields
-        // and showing only not ignored error fields. Add errorFlags strictly in the order below:
-        errorFlags.add(!profileDto.getName().isBlank() && bindingResult.hasFieldErrors("name"));
-        errorFlags.add(!profileDto.getUsername().isBlank() && bindingResult.hasFieldErrors("username")
-                && !profileDto.getUsername().equals(currentUser.getUsername()));
-        errorFlags.add(!profileDto.getEmail().isBlank() && bindingResult.hasFieldErrors("email")
-                && !profileDto.getEmail().equals(currentUser.getEmail()));
-        errorFlags.add(!profileDto.getPassword().isBlank() && bindingResult.hasFieldErrors("password"));
-        errorFlags.add(bindingResult.hasFieldErrors("dob"));
-        errorFlags.add(!profileDto.getTextColor().isBlank() && bindingResult.hasFieldErrors("testColor"));
+        // Profile flags has errors added. True - means having errors, False - no errors.
+        profileDtoNotBlankNotNullFlags.addErrors(bindingResult);
 
-        model.addAttribute("errorFlags", errorFlags);
+        model.addAttribute("errorFlags", profileDtoNotBlankNotNullFlags);
 
-        if (errorFlags.stream().anyMatch(flag -> flag))
+        if (profileDtoNotBlankNotNullFlags.findAnyError())
             return "profile/edit_profile";
 
-        //Password check. This will work only when username, email or password were changed and aren`t blank fields.
-        if (!profileDto.getUsername().isBlank() && !currentUser.getUsername().equals(profileDto.getUsername())
-                || !profileDto.getEmail().isBlank() && !currentUser.getEmail().equals(profileDto.getEmail())
-                || !profileDto.getPassword().isBlank()) {
-
+        if (profileDtoNotBlankNotNullFlags.isAnyChangedCredentials()) {
             if (personService.passwordCheck(profileDto.getPasswordCheck())) {
-                personService.updateUser(profileDto);
+                Person updatedUser = personService.prepareUpdatedUser(profileDto, personService.profileDtoNotBlankNotNullFlags(profileDto));
+                personService.updateUser(updatedUser);
                 return "redirect:/profile";
             } else {
                 bindingResult.rejectValue("passwordCheck", "", "Password Check failed");
@@ -83,7 +68,8 @@ public class ProfileController {
         }
 
         //When username, email or password are blank or unchanged, the update process will begin without password check.
-        personService.updateUser(profileDto);
+        Person updatedUser = personService.prepareUpdatedUser(profileDto, personService.profileDtoNotBlankNotNullFlags(profileDto));
+        personService.updateUser(updatedUser);
         return "redirect:/profile";
     }
 

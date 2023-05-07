@@ -124,30 +124,29 @@
     </style>
 </head>
 <body>
+<form th:object="${user}" style="margin-top:20px">
+    <div class="error" th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}">Error</div>
+</form>
+<br/>
 
 <form id="update" name="update" th:action="@{/profile/edit_profile}" th:method="POST" th:object="${user}">
     <h1>Update your profile</h1>
     <p style="color:#0c0"><b>Empty</b> and <b>unchanged</b> fields will be <b>ignored</b></p>
     <label for="name">Your Name:</label>
     <input type="text" id="name" name="name" th:field="*{name}">
-    <div th:if="${errorFlags[0]}" th:errors="*{name}" style="color:red"></div>
-<!--    <div th:if="${#fields.hasErrors('name') && errorFlags[0]}" th:errors="*{name}" style="color:red"></div>-->
-<!--    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></div>-->
+    <div th:if="${errorFlags.name}" th:errors="*{name}" style="color:red"></div>
     <br/>
     <label for="username">Username:</label>
     <input type="text" class="credentials" id="username" name="username" th:field="*{username}">
-    <div th:if="${errorFlags[1]}" th:errors="*{username}" style="color:red"></div>
-<!--    <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red"></div>-->
+    <div th:if="${errorFlags.username}" th:errors="*{username}" style="color:red"></div>
     <br/>
     <label for="email">Your Email:</label>
     <input type="text" class="credentials" id="email" name="email" th:field="*{email}">
-    <div th:if="${errorFlags[2]}" th:errors="*{email}" style="color:red"></div>
-<!--    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></div>-->
+    <div th:if="${errorFlags.email}" th:errors="*{email}" style="color:red"></div>
     <br/>
     <label for="password">Password:</label>
     <input type="password" class="credentials" id="password" name="password">
-    <div th:if="${errorFlags[3]}" th:errors="*{password}" style="color:red"></div>
-<!--    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></div>-->
+    <div th:if="${errorFlags.password}" th:errors="*{password}" style="color:red"></div>
     <div class="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
     <br/>
     <label for="confirm-password">Confirm Password:</label>
@@ -156,13 +155,11 @@
     <br/>
     <label for="dob">Date of Birth:</label>
     <input type="date" id="dob" name="dob" th:field="*{dob}" pattern="\d{2}/\d{2}/\d{4}">
-    <div th:if="${errorFlags[4]}" th:errors="*{dob}" style="color:red"></div>
-<!--    <div th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}" style="color:red"></div>-->
+    <div th:if="${errorFlags.dob}" th:errors="*{dob}" style="color:red"></div>
     <br/>
     <label for="textColor">Your message text color:</label>
     <input type="color" id="textColor" name="textColor" th:field="*{textColor}">
-    <div th:if="${errorFlags[5]}" th:errors="*{textColor}" style="color:red"></div>
-<!--    <div th:if="${#fields.hasErrors('textColor')}" th:errors="*{textColor}" style="color:red"></div>-->
+    <div th:if="${errorFlags.textColor}" th:errors="*{textColor}" style="color:red"></div>
     <br/>
     <input type="button" id="back" value="Back" onclick="window.location.href='/profile'">
     <input type="button" class="open-popup" id="update-button" data-popup="update-password-check" value="Update">
@@ -173,16 +170,13 @@
             <label for="password-check">Type current password:</label>
             <input type="password" id="password-check" name="password-check" th:field="*{passwordCheck}">
             <br/>
-            <input type="button" class="cancel" value="Cancel">
+            <input type="button" class="cancel" id="cancelUpdate" value="Cancel">
             <input type="submit" value="Update">
         </div>
     </div>
 </form>
 <br/>
-<form th:object="${user}" style="margin-top:20px">
-    <div class="error" th:if="${#fields.hasErrors('passwordCheck')}" th:errors="*{passwordCheck}">Error</div>
-</form>
-<br/>
+
 <form id="delete" name="delete" th:action="@{/profile/delete}" th:method="POST" th:object="${user}">
     <h3 style="color:red">Delete your account:</h3>
     <input type="button" class="open-popup" id="delete-button" data-popup="delete-password-check"
@@ -194,13 +188,13 @@
             <label for="password-check2">Type current password:</label>
             <input type="password" id="password-check2" name="password-check" th:field="*{passwordCheck}">
             <br/>
-            <input type="button" class="cancel" value="Cancel">
+            <input type="button" class="cancel" id="cancelDelete" value="Cancel">
             <input type="submit" id="delete-submit" value="Delete Account">
         </div>
     </div>
 </form>
 
-<script>
+<script th:inline="javascript">
     var popupDelete = document.querySelector('#delete-button'),
         popupUpdate = document.querySelector('#update-button'),
         divDelete = document.getElementById('delete-password-check'),
@@ -211,14 +205,30 @@
         credentials = document.querySelectorAll('.credentials'),
         passwordCheck = document.getElementById('password-check'),
         passwordCheck2 = document.getElementById('password-check2'),
+        cancelUpdate = document.getElementById('cancelUpdate'),
+        cancelDelete = document.getElementById('cancelDelete'),
+        backButton = document.getElementById('back'),
+        emailError = /*[[${errorFlags.email}]]*/ false,
+        usernameError = /*[[${errorFlags.username}]]*/ false,
+        passwordError = /*[[${errorFlags.password}]]*/ false,
         changedInput = false;
+
+    if (emailError || usernameError || passwordError) {
+            changedInput = true;
+    }
 
     credentials.forEach(item => item.addEventListener("input", (event) => changedInput = true));
 
     formUpdate.addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
-            event.preventDefault();
-            popupUpdate.click();
+            if (!passwordCheck.matches(':focus') && !cancelUpdate.matches(':focus')) {
+                event.preventDefault();
+                popupUpdate.click();
+            }
+            if (backButton.matches(':focus') {
+                event.preventDefault();
+                backButton.click();
+            }
         }
     });
 
@@ -236,9 +246,12 @@
     });
 
     formDelete.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-      }
+        if (event.key === "Enter") {
+            if (!cancelDelete.matches(':focus')) {
+                event.preventDefault();
+                popupDelete.click();
+            }
+        }
     });
 
     popupDelete.addEventListener('click', function () {
