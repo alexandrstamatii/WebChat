@@ -3,6 +3,7 @@ package com.astamatii.endava.webchat.controllers;
 import com.astamatii.endava.webchat.dto.RoomInfoDto;
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.models.Room;
+import com.astamatii.endava.webchat.security.PersonDetailsService;
 import com.astamatii.endava.webchat.services.PersonService;
 import com.astamatii.endava.webchat.services.RoomService;
 import com.astamatii.endava.webchat.utils.exceptions.ChatRoomsNotFoundException;
@@ -27,6 +28,7 @@ import java.util.List;
 public class RoomController {
 
     private final PersonService personService;
+    private final PersonDetailsService personDetailsService;
     private final RoomService roomService;
     private final ModelMapper modelMapper;
 
@@ -50,9 +52,9 @@ public class RoomController {
 
     @GetMapping("/create_room")
     public String createRoomPage(Model model) throws UsernameNotFoundException {
-        Person person = personService.getCurrentUser();
+        Person currentUser = personService.findUserByUsername(personDetailsService.getCurrentUsername());
         model.addAttribute("room", new Room());
-        model.addAttribute("personId", person.getId());
+        model.addAttribute("personId", currentUser.getId());
         return "room/create_room";
     }
 

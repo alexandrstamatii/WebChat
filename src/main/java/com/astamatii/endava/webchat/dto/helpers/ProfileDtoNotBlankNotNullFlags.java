@@ -31,9 +31,10 @@ public class ProfileDtoNotBlankNotNullFlags {
         this.city = false;
         this.language = false;
         this.errorsAdded = false;
+        this.anyChangedCredentials = false;
     }
 
-    public ProfileDtoNotBlankNotNullFlags(Boolean name, Boolean username, Boolean email, Boolean password, Boolean dob, Boolean textColor, Boolean theme, Boolean city, Boolean language) {
+    public ProfileDtoNotBlankNotNullFlags(Boolean name, Boolean username, Boolean email, Boolean password, Boolean dob, Boolean textColor, Boolean theme, Boolean city, Boolean language, Boolean errorsAdded) {
         this.name = name;
         this.username = username;
         this.email = email;
@@ -43,21 +44,23 @@ public class ProfileDtoNotBlankNotNullFlags {
         this.theme = theme;
         this.city = city;
         this.language = language;
-        this.errorsAdded = false;
+        this.errorsAdded = errorsAdded;
         this.anyChangedCredentials = username || email || password;
     }
 
-    public void addErrors(BindingResult bindingResult) {
-        this.name = this.name && bindingResult.hasFieldErrors("name");
-        this.username = this.username && bindingResult.hasFieldErrors("username");
-        this.email = this.email && bindingResult.hasFieldErrors("email");
-        this.password = this.password && bindingResult.hasFieldErrors("password");
-        this.dob = this.dob && bindingResult.hasFieldErrors("dob");
-        this.textColor = this.textColor && bindingResult.hasFieldErrors("textColor");
-        this.theme = this.theme && bindingResult.hasFieldErrors("theme");
-        this.city = this.city && bindingResult.hasFieldErrors("city");
-        this.language = this.language && bindingResult.hasFieldErrors("language");
-        this.errorsAdded = true;
+    public ProfileDtoNotBlankNotNullFlags getErrorFlags(BindingResult bindingResult) {
+        return new ProfileDtoNotBlankNotNullFlags(
+                this.name && bindingResult.hasFieldErrors("name"),
+                this.username && bindingResult.hasFieldErrors("username"),
+                this.email && bindingResult.hasFieldErrors("email"),
+                this.password && bindingResult.hasFieldErrors("password"),
+                this.dob && bindingResult.hasFieldErrors("dob"),
+                this.textColor && bindingResult.hasFieldErrors("textColor"),
+                this.theme && bindingResult.hasFieldErrors("theme"),
+                this.city && bindingResult.hasFieldErrors("city"),
+                this.language && bindingResult.hasFieldErrors("language"),
+                true
+        );
     }
 
     public Boolean findAnyError(){
