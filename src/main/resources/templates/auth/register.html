@@ -98,12 +98,12 @@
     <div class="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
 
     <label for="dob">Date of Birth:</label>
-    <input type="date" id="dob" name="dob" th:field="*{dob}" required pattern="\d{2}/\d{2}/\d{4}">
-    <div th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}" style="color:red"></div>
+    <input type="date" id="dob" name="dob" th:field="*{dob}" required pattern="\d{2}/\d{2}/\d{4}" max="9999-12-31">
+<!--    <div th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}" style="color:red"></div>-->
 
     <label for="textColor">Your message text color:</label>
     <input type="color" id="textColor" name="textColor" th:field="*{textColor}" required>
-    <div th:if="${#fields.hasErrors('textColor')}" th:errors="*{textColor}" style="color:red"></div>
+<!--    <div th:if="${#fields.hasErrors('textColor')}" th:errors="*{textColor}" style="color:red"></div>-->
 
     <input type="button" value="Sign In" onclick="window.location.href='/login'">
     <input type="submit" value="Register">

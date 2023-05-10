@@ -7,8 +7,6 @@ import com.astamatii.endava.webchat.utils.validators.UpdatedEmailConstraint;
 import com.astamatii.endava.webchat.utils.validators.UpdatedNameConstraint;
 import com.astamatii.endava.webchat.utils.validators.UpdatedPasswordConstraint;
 import com.astamatii.endava.webchat.utils.validators.UpdatedUsernameConstraint;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -27,9 +25,9 @@ public class ProfileDto {
     private String email;
 
     @UpdatedPasswordConstraint
+    @Size(max = 255, message = "The password can have maximum 255 characters")
     private String password;
 
-//    @DateTimeFormat(pattern = "dd.MM.yyyy") //throws DateTimeParseException ("Date format should be dd.MM.yyyy")
     private LocalDate dob;
 
     private String textColor;

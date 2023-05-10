@@ -19,6 +19,6 @@ public class UpdatedNameValidator implements
     public boolean isValid(String name,
                            ConstraintValidatorContext context) {
         int length = name.length();
-        return (length > 3 && length < 30) || name.equals("");
+        return (length >= 3 && length < 51) || name.equals("");
     }
 }

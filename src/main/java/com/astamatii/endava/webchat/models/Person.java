@@ -1,6 +1,5 @@
 package com.astamatii.endava.webchat.models;
 
-import com.astamatii.endava.webchat.utils.exceptions.ResourceNullValueFieldException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -22,16 +21,16 @@ public class Person {
     private Long id;
 
     @NotBlank(message = "The name should not be blank or empty")
-    @Size(min = 3, max = 30, message = "The name length must be between 3 and 30 letters")
+    @Size(min = 3, max = 50, message = "The name length must be between 3 and 50 letters")
     @NotNull
-    @Column(length = 30)
+    @Column(length = 50)
     private String name;
 
     @NotBlank(message = "The username should not be blank or empty")
-    @Size(min = 3, max = 15, message = "The username length must be between 3 and 15 letters")
+    @Size(min = 3, max = 30, message = "The username length must be between 3 and 30 letters")
     @Pattern(regexp = "^[a-z][a-z0-9]*$", message = "The username must contain only lowercase letters and numbers, and start from a letter")
     @NotNull
-    @Column(unique = true, length = 15)
+    @Column(unique = true, length = 30)
     private String username;
 
     @NotBlank(message = "The name should not be blank (with whitespaces at both ends) or empty")
@@ -43,6 +42,7 @@ public class Person {
 
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
             message = "Password must contain: at least 8 characters, one uppercase letter, one lowercase letter, one digit")
+    @Size(max = 255, message = "The password can have maximum 255 characters")
     @NotNull
     private String password;
 
@@ -106,39 +106,10 @@ public class Person {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PrivateMessage> privateMessages;
 
-    public void setName(String name) {
-        if (this.name == null)
-            throw new ResourceNullValueFieldException("Argument name must not be null");
-
-        this.name =  name.trim();
-    }
-
-    public void setUsername(String username) {
-        if (this.username == null)
-            throw new ResourceNullValueFieldException("Argument username must not be null");
-
-        this.username = username.trim();
-    }
-
-    public void setEmail(String email) {
-        if (email == null)
-            throw new ResourceNullValueFieldException("Argument email must not be null");
-
-        this.email = email.trim();
-    }
-
-    public void setPassword(String password) {
-        if (password == null)
-            throw new ResourceNullValueFieldException("Argument password must not be null");
-
-        this.password = password;
-    }
-
     public void setTextColor(String textColor) {
-        if(textColor == null || !textColor.matches("^#[0-9A-Fa-f]{6}$"))
-            textColor = "#000000";
-
-        this.textColor = textColor;
+        if (textColor.matches("^#[0-9A-Fa-f]{6}$"))
+            this.textColor = textColor;
+        else this.textColor = "#000000";
     }
 
     @PrePersist
@@ -149,7 +120,6 @@ public class Person {
 //        }
 
         ZonedDateTime currentTime = ZonedDateTime.now();
-
         this.enabled = true;
         this.createdAt = currentTime;
         this.updatedAt = currentTime;

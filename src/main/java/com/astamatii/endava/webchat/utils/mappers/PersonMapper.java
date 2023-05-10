@@ -5,12 +5,17 @@ import com.astamatii.endava.webchat.models.City;
 import com.astamatii.endava.webchat.models.Language;
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.models.Theme;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Component
+@RequiredArgsConstructor
 public class PersonMapper {
+    private final PasswordEncoder passwordEncoder;
+
     public Person mapToPerson(ProfileDto profileDto) {
         Person user = new Person();
         user.setName(profileDto.getName());
@@ -40,7 +45,7 @@ public class PersonMapper {
         return profileDto;
     }
 
-    public void mapProfileDtoToPerson(Person user, ProfileDto profileDto) {
+    public void updatePerson(Person user, ProfileDto profileDto) {
         String name = profileDto.getName(),
                 username = profileDto.getUsername(),
                 email = profileDto.getEmail(),
@@ -52,23 +57,23 @@ public class PersonMapper {
         Language language = profileDto.getLanguage();
 
         if (!(name.isBlank() || name.equals(user.getName())))
-            user.setName(profileDto.getName());
+            user.setName(name);
         if (!(username.isBlank() || username.equals(user.getUsername())))
-            user.setUsername(profileDto.getUsername());
+            user.setUsername(username);
         if (!(email.isBlank() || email.equals(user.getEmail())))
-            user.setEmail(profileDto.getEmail());
+            user.setEmail(email);
         if (!password.isBlank())
-            user.setPassword(profileDto.getPassword());
+            user.setPassword(passwordEncoder.encode(password));
         if (dob != null)
-            user.setDob(profileDto.getDob());
+            user.setDob(dob);
         if (!(textColor.isBlank() || textColor.equals(user.getTextColor())))
-            user.setTextColor(profileDto.getTextColor());
+            user.setTextColor(textColor);
         if (theme != null)
-            user.setTheme(profileDto.getTheme());
+            user.setTheme(theme);
         if (city != null)
-            user.setCity(profileDto.getCity());
+            user.setCity(city);
         if (language != null)
-            user.setLanguage(profileDto.getLanguage());
+            user.setLanguage(language);
     }
 
 }

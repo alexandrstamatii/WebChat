@@ -1,10 +1,7 @@
 package com.astamatii.endava.webchat.services;
 
-import com.astamatii.endava.webchat.dto.ProfileDto;
-import com.astamatii.endava.webchat.dto.helpers.ProfileDtoNotBlankNotNullFlags;
 import com.astamatii.endava.webchat.models.Person;
 import com.astamatii.endava.webchat.repositories.PersonRepository;
-import com.astamatii.endava.webchat.security.PersonDetailsService;
 import com.astamatii.endava.webchat.utils.exceptions.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -57,67 +54,21 @@ public class PersonService {
     @Transactional
     public Person updateUser(Person updatedUser) {
         updatedUser.setUpdatedAt(ZonedDateTime.now());
-        String encodedPassword = passwordEncoder.encode(updatedUser.getPassword());
-        updatedUser.setPassword(encodedPassword);
 
         return personRepository.save(updatedUser);
     }
 
     @Transactional
-    public void deleteUserByUsername(String username) { personRepository.deleteByUsername(username); }
+    public void deleteUserByUsername(String username) {
+        personRepository.deleteByUsername(username);
+    }
 
     @Transactional
-    public void deleteUser(Person user) { personRepository.delete(user); }
+    public void deleteUser(Person user) {
+        personRepository.delete(user);
+    }
 
     public boolean passwordCheck(String enteredPassword, String encryptedPassword) {
         return passwordEncoder.matches(enteredPassword, encryptedPassword);
     }
-
-
-
-//    public ProfileDtoNotBlankNotNullFlags profileDtoNotBlankNotNullFlags(ProfileDto profileDto, Person currentUser) {
-//        String username = profileDto.getUsername();
-//        String email = profileDto.getEmail();
-//
-//        return new ProfileDtoNotBlankNotNullFlags(
-//                isNotBlank(profileDto.getName()),
-//                isNotBlank(username) && isNotEqual(currentUser.getUsername(), username),
-//                isNotBlank(email) && isNotEqual(currentUser.getEmail(), email),
-//                isNotBlank(profileDto.getPassword()),
-//                isNotNull(profileDto.getDob()),
-//                isNotBlank(profileDto.getTextColor()),
-//                isNotNull(profileDto.getTheme()),
-//                isNotNull(profileDto.getCity()),
-//                isNotNull(profileDto.getLanguage()),
-//                false
-//        );
-//    }
-//
-//    public Person prepareUpdatedUser(ProfileDto profileDto, Person currentUser, ProfileDtoNotBlankNotNullFlags profileDtoNotBlankNotNullFlags) {
-//
-//        //Blank and Empty String and null fields, will be replaced by current values
-//        if (profileDtoNotBlankNotNullFlags.getUsername()) {
-//            String username = profileDto.getUsername();
-//            findUserExistenceByUsername(username);
-//            currentUser.setUsername(username);
-//        }
-//        if (profileDtoNotBlankNotNullFlags.getEmail()) {
-//            String email = profileDto.getEmail();
-//            findUserExistenceByEmail(email);
-//            currentUser.setEmail(email);
-//        }
-//
-//        if (profileDtoNotBlankNotNullFlags.getPassword())
-//            currentUser.setPassword(passwordEncoder.encode(profileDto.getPassword()));
-//        if (profileDtoNotBlankNotNullFlags.getName()) currentUser.setName(profileDto.getName());
-//        if (profileDtoNotBlankNotNullFlags.getTextColor()) currentUser.setTextColor(profileDto.getTextColor());
-//        if (profileDtoNotBlankNotNullFlags.getDob()) currentUser.setDob(profileDto.getDob());
-//        if (profileDtoNotBlankNotNullFlags.getTheme()) currentUser.setTheme(profileDto.getTheme());
-//        if (profileDtoNotBlankNotNullFlags.getCity()) currentUser.setCity(profileDto.getCity());
-//        if (profileDtoNotBlankNotNullFlags.getLanguage()) currentUser.setLanguage(profileDto.getLanguage());
-//
-//        currentUser.setUpdatedAt(ZonedDateTime.now());
-//
-//        return currentUser;
-//    }
 }

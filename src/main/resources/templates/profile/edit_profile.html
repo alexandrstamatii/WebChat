@@ -159,7 +159,7 @@
     <div class="password-mismatch" style="display: none; color: red;">Passwords do not match</div>
     <br/>
     <label for="dob">Date of Birth:</label>
-    <input type="date" id="dob" name="dob" th:field="*{dob}" pattern="\d{2}/\d{2}/\d{4}">
+    <input type="date" id="dob" name="dob" th:field="*{dob}" pattern="\d{2}/\d{2}/\d{4}" max="9999-12-31">
     <div th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}" style="color:red"></div>
 <!--    <div th:if="${errorFlags.dob}" th:errors="*{dob}" style="color:red"></div>-->
     <br/>

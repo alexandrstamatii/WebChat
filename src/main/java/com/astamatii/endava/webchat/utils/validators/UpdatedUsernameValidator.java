@@ -34,9 +34,9 @@ public class UpdatedUsernameValidator implements
         }
 
         int length = username.length();
-        if ((length != 0 && length < 3) || length > 15 ) {
+        if ((length != 0 && length < 3) || length > 30 ) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("The username must be between 3 and 15 letters in length")
+            context.buildConstraintViolationWithTemplate("The username must be between 3 and 30 letters in length")
                     .addConstraintViolation();
             return false;
         }

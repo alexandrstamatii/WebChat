@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UpdatedUsernameConstraint {
-    String message() default "This username is already taken";
+    String message() default "This username does not meet the requirements";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

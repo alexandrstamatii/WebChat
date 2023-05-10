@@ -42,7 +42,7 @@ public class UpdatedEmailValidator implements
             return false;
         }
 
-        if (!(email.matches("^(.+)@(.+)$") || email.equals(""))) {
+        if (!(email.matches("^[a-zA-Z0-9][^\\s]*@[^\\s]*[a-zA-Z0-9]$") || email.equals(""))) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("The email should look like this: your_email@email.com")
                     .addConstraintViolation();

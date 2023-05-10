@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UpdatedEmailConstraint {
-    String message() default "This email is already taken";
+    String message() default "This email does not meet the requirements";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
