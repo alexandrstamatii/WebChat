@@ -31,7 +31,7 @@ public class AuthController {
     public String registerUser(@ModelAttribute("user") @Valid Person person, BindingResult bindingResult) {
 
         try {
-            personService.findUserExistenceByEmail(person.getUsername());
+            personService.findUserExistenceByUsername(person.getUsername());
         } catch (UsernameExistsException e) {
             bindingResult.rejectValue("username", "", e.getMessage());
         }

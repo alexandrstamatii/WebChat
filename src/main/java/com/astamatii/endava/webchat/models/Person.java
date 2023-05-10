@@ -1,5 +1,6 @@
 package com.astamatii.endava.webchat.models;
 
+import com.astamatii.endava.webchat.utils.exceptions.ResourceNullValueFieldException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -21,32 +22,32 @@ public class Person {
     private Long id;
 
     @NotBlank(message = "The name should not be blank or empty")
-    @Size(min = 3, max = 30, message = "The name must be between 3 and 30 letters in length")
+    @Size(min = 3, max = 30, message = "The name length must be between 3 and 30 letters")
     @NotNull
     @Column(length = 30)
     private String name;
 
     @NotBlank(message = "The username should not be blank or empty")
-    @Size(min = 3, max = 15, message = "The username must be between 3 and 15 letters in length")
+    @Size(min = 3, max = 15, message = "The username length must be between 3 and 15 letters")
+    @Pattern(regexp = "^[a-z][a-z0-9]*$", message = "The username must contain only lowercase letters and numbers, and start from a letter")
     @NotNull
     @Column(unique = true, length = 15)
     private String username;
 
     @NotBlank(message = "The name should not be blank (with whitespaces at both ends) or empty")
-    @Size(max = 30, message = "The email must have less or 30 letters in length")
+    @Size(max = 30, message = "The email can have maximum 30 characters")
     @Email(message = "The email should look like this: your_email@email.com")
     @NotNull
     @Column(unique = true, length = 30)
     private String email;
 
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.")
+            message = "Password must contain: at least 8 characters, one uppercase letter, one lowercase letter, one digit")
     @NotNull
     private String password;
 
     private LocalDate dob;
 
-    @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Hex value must be in the format #RRGGBB")
     @NotBlank(message = "The name should not be blank (with whitespaces at both ends) or empty")
     @Column(columnDefinition = "varchar(7) DEFAULT '#000000'")
     private String textColor;
@@ -105,27 +106,39 @@ public class Person {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PrivateMessage> privateMessages;
 
-    public Person(String name, String username, String email, String password) {
-        this.name = name.trim();
-        this.username = username.trim();
-        this.email = email.trim();
-        this.password = password;
-    }
-
     public void setName(String name) {
-        this.name = name.trim();
+        if (this.name == null)
+            throw new ResourceNullValueFieldException("Argument name must not be null");
+
+        this.name =  name.trim();
     }
 
     public void setUsername(String username) {
+        if (this.username == null)
+            throw new ResourceNullValueFieldException("Argument username must not be null");
+
         this.username = username.trim();
     }
 
     public void setEmail(String email) {
+        if (email == null)
+            throw new ResourceNullValueFieldException("Argument email must not be null");
+
         this.email = email.trim();
     }
 
+    public void setPassword(String password) {
+        if (password == null)
+            throw new ResourceNullValueFieldException("Argument password must not be null");
+
+        this.password = password;
+    }
+
     public void setTextColor(String textColor) {
-        this.textColor = textColor.trim();
+        if(textColor == null || !textColor.matches("^#[0-9A-Fa-f]{6}$"))
+            textColor = "#000000";
+
+        this.textColor = textColor;
     }
 
     @PrePersist
